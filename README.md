@@ -4,9 +4,17 @@
 
 # Agentic Slides
 
-A Claude Code skill that builds production-quality presentation decks using AI agents. Works with [Paper](https://paper.design) and [Figma](https://figma.com).
+A Claude Code skill that builds production-quality presentation decks using AI agents.
 
 Takes any source material — outlines, docs, transcripts, URLs — and produces polished decks with real design intelligence. Handles content distillation, layout planning, visual design, copy quality, and export.
+
+## Canvas options
+
+**Paper (default)** — the primary canvas. Builds decks by writing HTML incrementally to the Paper canvas, screenshots to verify, and exports pixel-perfect PDFs. Best for rapid iteration and solo workflows.
+
+**Figma** — builds decks directly on the Figma canvas using your design system's components, variables, and auto-layout via the [Figma MCP server](https://www.figma.com/blog/the-figma-canvas-is-now-open-to-agents/) and its `use_figma` tool. Your team can collaborate on the output, modify text, swap tokens, and hand off to production. Best for team workflows and design system integration.
+
+Specify which canvas when you invoke the skill. Paper is the default if you don't specify.
 
 ## What it does
 
@@ -14,21 +22,19 @@ Takes any source material — outlines, docs, transcripts, URLs — and produces
 - Assigns layouts from a pattern library that matches content shape to visual structure
 - Enforces a design system (palette, typography, spacing, structural rules)
 - Runs a four-pass quality system with parallel scoring agents
-- Exports to PDF (via Paper) or editable Figma files (via Desktop Bridge MCP)
+- Self-healing loops: screenshots output, evaluates, iterates on mismatches
 - Maintains a feedback log that gets smarter with every session
-
-## Design tools
-
-**Paper** — primary canvas for building decks. Writes HTML incrementally, screenshots to verify, exports pixel-perfect PDFs.
-
-**Figma** — exports Paper decks into editable Figma frames with real text layers, correct fonts, proper colors, and auto-layout. Your team can collaborate on the Figma file and hand off to production.
 
 ## Requirements
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (CLI)
+
+**For Paper (default):**
 - [Paper](https://paper.design) desktop app with MCP enabled
 - Python 3 with Pillow (`pip install Pillow`) for PDF export
-- Figma + [Figma Console MCP](https://www.npmjs.com/package/figma-console-mcp) (optional, for Figma export)
+
+**For Figma:**
+- [Figma MCP server](https://www.figma.com/developers/mcp) configured in Claude Code
 
 ## Installation
 
@@ -40,38 +46,21 @@ git clone https://github.com/Julianlapis/agentic-slides.git
 cp -r agentic-slides/paper-slides/ ~/.claude/commands/paper-slides/
 ```
 
-Your directory structure should look like:
-
-```
-~/.claude/commands/
-  paper-slides/
-    SKILL.md                   # Main skill file
-    feedback-log.md            # Learning log (grows with use)
-    references/
-      anti-patterns.md         # Common mistakes to avoid
-      default-design-system.md # Fallback design system
-      figma-export.md          # Figma export pipeline
-      layouts.md               # Layout pattern library
-      pdf-export.md            # PDF export pipeline
-      quality-system.md        # Four-pass quality scoring
-      typography.md            # Typography rules
-```
-
 ## Usage
 
-### Build a new deck
+### Build a deck in Paper (default)
 
 ```
 /paper-slides Build a 15-slide strategy deck from this outline: [paste outline]
 ```
 
-### Export to Figma
+### Build a deck in Figma
 
 ```
-/paper-slides Export this deck to Figma
+/paper-slides Build a 15-slide strategy deck in Figma from this outline: [paste outline]
 ```
 
-### Export to PDF
+### Export to PDF (Paper only)
 
 ```
 /paper-slides Export the current deck to PDF
@@ -95,7 +84,10 @@ Reads the full content, understands the narrative arc, and assigns a layout to e
 Reads the design system file and extracts palette, typography, spacing, and structural rules.
 
 ### Phase 4: Build
-Creates artboards in Paper, writes HTML incrementally (one visual group at a time), and screenshots to verify every 2-3 slides.
+Constructs the deck on your chosen canvas:
+
+- **Paper** — creates artboards, writes HTML incrementally (one visual group at a time), screenshots to verify every 2-3 slides.
+- **Figma** — creates frames using `use_figma`, leveraging your design system's components, variables, and auto-layout. Screenshots and iterates via self-healing loops.
 
 ### Phase 5: Quality System
 Four parallel agents score the deck:
@@ -108,8 +100,8 @@ Four parallel agents score the deck:
 Any score below 35/50 triggers automatic fixes.
 
 ### Phase 6: Export
-**PDF** — screenshots each artboard at 2x via Paper's MCP API, assembles with Pillow.
-**Figma** — writes editable frames via Desktop Bridge MCP with real text layers, fonts, colors, and auto-layout.
+- **Paper** — screenshots each artboard at 2x, assembles with Pillow into a PDF.
+- **Figma** — your deck is already in Figma. Share the file, export frames, or hand off to production.
 
 ## Design Systems
 
