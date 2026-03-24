@@ -1,83 +1,66 @@
 ---
 name: figma-export
-description: Figma Export Pipeline for Paper Slides - editable Figma layers via Desktop Bridge MCP
+description: Figma build and export pipeline using the official Figma MCP use_figma tool
 ---
 
-# Figma Export Pipeline for Paper Slides
+# Figma Pipeline
 
 ## What This Does
 
-Exports a Paper deck into editable Figma frames with real text layers, correct fonts, proper colors, and auto-layout. The team can collaborate on the Figma file, modify text, swap colors, and hand off to production.
+Two modes:
+
+1. **Build in Figma** — constructs slides directly on the Figma canvas using `use_figma`. The deck lives natively in Figma with real frames, auto-layout, text layers, and (when available) design system components and variables.
+2. **Paper → Figma export** — reads a completed Paper deck, translates each slide into editable Figma frames. The team can collaborate, modify, and hand off in Figma.
 
 ## Prerequisites
 
-### 1. Figma Console MCP Server (one-time setup)
+The official Figma MCP server must be connected. This is available as a claude.ai integration — no local install required.
 
-Install the MCP server into Claude Code:
+**Required tools:**
+- `mcp__claude_ai_Figma__use_figma` — write to the canvas (Plugin API JavaScript)
+- `mcp__claude_ai_Figma__get_screenshot` — screenshot nodes for verification
+- `mcp__claude_ai_Figma__get_design_context` — read existing designs
+- `mcp__claude_ai_Figma__search_design_system` — find reusable components/variables
+- `mcp__claude_ai_Figma__get_metadata` — file structure and pages
 
-```bash
-claude mcp add figma-console \
-  -s user \
-  -e FIGMA_ACCESS_TOKEN=figd_YOUR_TOKEN_HERE \
-  -e ENABLE_MCP_APPS=true \
-  -- npx -y figma-console-mcp@latest
-```
+**User provides:** A Figma file URL or file key. Extract the key from the URL: `figma.com/design/:fileKey/:fileName`.
 
-To get a Figma access token: Figma → Settings → Account → Personal access tokens → Generate.
-
-### 2. Desktop Bridge Plugin (one-time setup)
-
-The plugin files live at `~/.figma-console-mcp/plugin/`. They're installed automatically when the MCP server first runs. To load the plugin into Figma:
-
-1. Open Figma Desktop (not web)
-2. Plugins → Development → Import plugin from manifest
-3. In the file picker, press **Cmd+Shift+G** and paste: `~/.figma-console-mcp/plugin/`
-4. Select `manifest.json` → Open
-
-Once imported, it persists across sessions. You only need to run it each time:
-Plugins → Development → Figma Desktop Bridge
-
-### 3. Font Availability
-
-Fonts used in Paper must be installed locally for Figma to load them. Cormorant Garamond and Inter are the defaults for C&T strategy decks. Google Fonts installs work. Figma will throw on `loadFontAsync` if a font/weight combo isn't available.
+**Fonts:** Fonts used in the deck must be available in the Figma file. Use `loadFontAsync` to verify before writing text. Google Fonts are generally available. Custom fonts need to be uploaded to the Figma team.
 
 ---
 
 ## Architecture
 
-Two MCP servers in sequence:
+Single MCP server: the official Figma MCP. Each slide is one `use_figma` call containing Plugin API JavaScript.
 
-1. **Paper MCP** (read): `get_basic_info`, `get_jsx`, `get_computed_styles`, `get_screenshot`
-2. **Figma Console MCP** (write): `figma_execute`, `figma_capture_screenshot`, `figma_set_image_fill`
-
-No intermediate JSON format. Translation happens directly from Paper's JSX output to Figma Plugin API calls.
+For Paper → Figma export, Paper MCP is also used (read-only) to extract slide structure:
+- `get_basic_info` → artboard list
+- `get_jsx(nodeId, format: "inline-styles")` → slide structure and styles
+- `get_computed_styles(nodeIds)` → precise CSS values when needed
 
 ---
 
-## Preflight (MANDATORY)
+## Preflight
 
-Run these checks before extracting anything from Paper. If Figma is unreachable, stop immediately.
-
-### Step 1: Test Bridge Connection
+### Step 1: Test Access
 
 ```javascript
-// figma_execute
+// use_figma probe
 return { ok: true, timestamp: Date.now() }
 ```
 
-If this fails with "Cannot connect to Figma Desktop", the user needs to open the Desktop Bridge plugin in Figma. Check `lsof -i :9223` to verify the WebSocket port.
+If this fails, the Figma MCP server isn't connected.
 
 ### Step 2: Create a Dedicated Page
 
 ```javascript
 const page = figma.createPage();
-page.name = "V4 — Deck Name";
+page.name = "Deck Name — V1";
 await figma.setCurrentPageAsync(page);
+return { pageId: page.id, pageName: page.name };
 ```
 
-Clean up any duplicate/empty pages after creation.
-
-### Step 3: Load All Fonts
+### Step 3: Load Fonts
 
 ```javascript
 const fonts = [
@@ -86,64 +69,78 @@ const fonts = [
   { family: "Inter", style: "Semi Bold" },
   { family: "Inter", style: "Bold" },
   { family: "Inter", style: "Light" },
-  { family: "Cormorant Garamond", style: "Regular" },
-  { family: "Cormorant Garamond", style: "Light" },
-  { family: "Cormorant Garamond", style: "Medium" },
-  { family: "Cormorant Garamond", style: "Bold" },
-  { family: "Cormorant Garamond", style: "Italic" },
 ];
 const loaded = [], failed = [];
 for (const f of fonts) {
   try { await figma.loadFontAsync(f); loaded.push(f); }
   catch { failed.push(f); }
 }
+return { loaded, failed };
 ```
 
-Present the font manifest to the user. If critical fonts fail, stop and resolve before proceeding.
+Adapt the font list to the design system. Present results to the user. If critical fonts fail, resolve before proceeding.
 
-### Step 4: Get Paper Deck Structure
+### Step 4: Search for Design System Components
+
+Before building from scratch, check what's already available:
 
 ```
-get_basic_info() → artboards list with IDs, names, dimensions
+mcp__claude_ai_Figma__search_design_system(fileKey, query: "button")
 ```
 
-Filter to the target version (e.g., artboards starting with "V4 —").
+Import reusable components via `importComponentByKeyAsync` / `importComponentSetByKeyAsync` instead of recreating them.
 
 ---
 
-## Per-Slide Pipeline
+## Per-Slide Build
 
-For each slide, in order:
+### Building Directly in Figma
 
-### 1. Extract from Paper
-
-```
-get_jsx(nodeId, format: "inline-styles") → JSX with all styles
-```
-
-This is the primary source of truth. Only use `get_computed_styles` if JSX inline styles are missing something.
-
-### 2. Translate to Figma
-
-One `figma_execute` call per slide (stays within 30s timeout for typical slides).
-
-#### CRITICAL: Frame Sizing Fix
-
-When you set `layoutMode` on a frame, Figma defaults to "hug contents" sizing, which collapses the slide to content height. You MUST set fixed sizing immediately after:
+One `use_figma` call per slide. Each call creates a complete slide frame with all content.
 
 ```javascript
+// Slide frame setup — CRITICAL sizing rules
 const slide = figma.createFrame();
+slide.name = "01 — Title Slide";
 slide.layoutMode = "VERTICAL";
 slide.resize(1456, 816);
-slide.primaryAxisSizingMode = "FIXED";  // ← THIS IS MANDATORY
-slide.counterAxisSizingMode = "FIXED";  // ← THIS IS MANDATORY
+slide.primaryAxisSizingMode = "FIXED";   // MANDATORY — prevents height collapse
+slide.counterAxisSizingMode = "FIXED";   // MANDATORY — prevents width collapse
+slide.paddingTop = 60;
+slide.paddingBottom = 60;
+slide.paddingLeft = 60;
+slide.paddingRight = 60;
+slide.x = slideIndex * (1456 + 80);      // horizontal spacing between slides
+
+// Background
+sf(slide, "#1A1A1A");
+
+// Content + text nodes...
 ```
 
-Without these two lines, every slide will collapse to ~200px tall. This was the #1 bug in the initial implementation.
+### Paper → Figma Export
 
-#### Helper Functions
+For each Paper slide:
 
-Include these in every `figma_execute` call:
+1. **Extract from Paper:** `get_jsx(nodeId, format: "inline-styles")` — primary source of truth
+2. **Translate to Figma:** Convert CSS properties to Plugin API equivalents (see mapping below)
+3. **Write to Figma:** One `use_figma` call per slide
+
+### Verify
+
+After every 2-3 slides:
+
+```
+mcp__claude_ai_Figma__get_screenshot(fileKey, nodeId)
+```
+
+Compare visually against intent (or Paper original for exports). Fix mismatches before continuing.
+
+---
+
+## Helper Functions
+
+Include these in `use_figma` calls that need them:
 
 ```javascript
 // Parse hex color (supports #RRGGBB and #RRGGBBAA)
@@ -167,7 +164,9 @@ function sf(node, hex) {
 }
 ```
 
-#### CSS → Figma Property Mapping
+---
+
+## CSS → Figma Property Mapping
 
 | CSS | Figma Plugin API |
 |-----|-----------------|
@@ -200,7 +199,7 @@ function sf(node, hex) {
 | `position: absolute` | `layoutPositioning = "ABSOLUTE"` + constraints |
 | No fill (transparent) | `fills = []` |
 
-#### Font Weight Map
+### Font Weight Map
 
 | CSS fontWeight | Figma style string |
 |---------------|-------------------|
@@ -211,9 +210,41 @@ function sf(node, hex) {
 | 300 | `"Light"` |
 | italic | `"Italic"` |
 
-#### Footer Pattern (Absolute Positioned)
+---
 
-The footer in C&T strategy decks is absolute-positioned at the bottom:
+## Known Pitfalls
+
+### 1. Frame Height Collapse (CRITICAL)
+**Problem:** `layoutMode = "VERTICAL"` makes frames hug content by default.
+**Fix:** Always set `primaryAxisSizingMode = "FIXED"` and `counterAxisSizingMode = "FIXED"` on slide frames.
+
+### 2. HORIZONTAL Frames Default to 100px Height (CRITICAL)
+**Problem:** HORIZONTAL auto-layout frames default to ~100px FIXED height even when content is shorter.
+**Fix:** After creating any HORIZONTAL auto-layout frame, immediately set `layoutSizingVertical = "HUG"`.
+
+### 3. HUG Containers Can't CENTER Content (CRITICAL)
+**Problem:** `primaryAxisAlignItems = "CENTER"` on a HUG frame does nothing — there's no extra space to distribute.
+**Fix:** Container must be `layoutSizingVertical = "FILL"` for vertical centering to work.
+
+### 4. Content Clipping
+**Problem:** Auto-layout child frames default to `clipsContent = true`.
+**Fix:** Set `clipsContent = false` on content frames. Use `layoutSizingVertical = "HUG"` on containers that should expand.
+
+### 5. Stroke API
+**Problem:** `node.strokes` requires `color: { r, g, b }` without `a`.
+**Fix:** For strokes, use `color: { r, g, b }` only. Set stroke opacity separately.
+
+### 6. Dynamic Page Access
+**Problem:** `figma.getNodeById()` fails with dynamic page access.
+**Fix:** Always use `await figma.getNodeByIdAsync()`.
+
+### 7. Split-Panel Alignment
+**Problem:** Side-by-side panels with different vertical alignment look misaligned.
+**Fix:** Set both panels to `primaryAxisAlignItems = "CENTER"` and `layoutSizingVertical = "FILL"`.
+
+---
+
+## Footer Pattern (Absolute Positioned)
 
 ```javascript
 const footer = figma.createFrame();
@@ -223,116 +254,26 @@ footer.fills = [];
 footer.layoutPositioning = "ABSOLUTE";
 footer.constraints = { horizontal: "STRETCH", vertical: "MAX" };
 footer.layoutMode = "HORIZONTAL";
-footer.primaryAxisAlignItems = "SPACE_BETWEEN"; // or "MAX" for right-only, "CENTER" for centered
+footer.primaryAxisAlignItems = "SPACE_BETWEEN";
 footer.x = 0;
-footer.y = 730; // slide height (816) minus 86px — gives 26px breathing room below text
+footer.y = 730; // slide height (816) minus 86px
 footer.resize(1456, 60);
 footer.paddingLeft = 60;
 footer.paddingRight = 60;
 footer.counterAxisAlignItems = "MAX";
 ```
 
-#### Slide Positioning
-
-Space slides horizontally on the Figma canvas:
-
-```javascript
-slide.x = slideIndex * (slideWidth + 80); // 80px gap between slides
-```
-
-### 3. Verify
-
-After writing each slide (or every 2-3 slides for speed):
-
-```
-figma_capture_screenshot(nodeId, scale: 1)
-```
-
-Compare visually against Paper original (`get_screenshot` from Paper MCP).
-
 ---
 
-## Known Pitfalls
+## Fidelity Check (Paper → Figma Export)
 
-### 1. Frame Height Collapse (CRITICAL)
-**Problem:** `layoutMode = "VERTICAL"` makes frames hug content by default.
-**Fix:** Always set `primaryAxisSizingMode = "FIXED"` and `counterAxisSizingMode = "FIXED"` on slide frames.
+After all slides are written:
 
-### 2. Content Clipping
-**Problem:** Auto-layout child frames default to `clipsContent = true` and may clip text.
-**Fix:** After building, walk the tree and set `clipsContent = false` on content frames. Set `layoutSizingVertical = "HUG"` on containers that should expand to fit their children.
-
-### 3. Stroke API Differences
-**Problem:** `node.strokes` requires `color: { r, g, b }` without `a` (opacity goes in a separate property). Using `pc()` which returns `{ r, g, b, a }` will fail.
-**Fix:** For strokes, use `color: { r, g, b }` only. Set stroke opacity separately if needed.
-
-### 4. Individual Stroke Weights
-**Problem:** Setting `strokeLeftWeight`, `strokeTopWeight` etc. on frames without `strokesAlign` set causes "object is not extensible" errors.
-**Fix:** Use a thin colored frame as a visual line/border instead of stroke properties. More reliable.
-
-### 5. Dynamic Page Access
-**Problem:** `figma.getNodeById()` fails with `documentAccess: dynamic-page`.
-**Fix:** Always use `await figma.getNodeByIdAsync()`.
-
-### 6. figma_execute Timeout
-**Problem:** Default timeout is 5000ms. Complex slides need more.
-**Fix:** Set `timeout: 30000` on every `figma_execute` call. If a slide has 40+ nodes, split into multiple calls.
-
-### 7. Housekeeping Warnings
-**Problem:** Figma Console MCP warns about floating nodes, duplicate pages, etc.
-**Fix:** Ignore these during the build. Clean up orphaned frames at the end.
-
-### 8. HORIZONTAL Auto-Layout Frames Default to 100px Height (CRITICAL)
-**Problem:** When you create a HORIZONTAL auto-layout frame (e.g., a row containing a number + label), Figma defaults it to ~100px FIXED height even though its content is only ~34px. This causes massive vertical spacing distortion in parent VERTICAL containers.
-**Fix:** After creating any HORIZONTAL auto-layout frame, immediately set `layoutSizingVertical = "HUG"`. This was the root cause of slide 09's items being spread across the full height.
-
-### 9. HUG Containers Can't CENTER Content (CRITICAL)
-**Problem:** Setting `primaryAxisAlignItems = "CENTER"` on a VERTICAL frame that has `layoutSizingVertical = "HUG"` does nothing. HUG shrinks the frame to exactly fit its content, leaving zero extra space for centering to distribute.
-**Fix:** For vertical centering to work, the container must be `layoutSizingVertical = "FILL"` so it takes its full parent height. Then CENTER distributes the extra space above and below the content.
-
-### 10. Split-Panel Slides Need Aligned Vertical Centers
-**Problem:** In side-by-side panel layouts (e.g., slide 14's red left + cream right), if one panel uses `MAX` (bottom-align) and the other uses `MIN` (top-align), the content blocks look misaligned even though each panel is internally correct.
-**Fix:** Set both panels to `primaryAxisAlignItems = "CENTER"` and `layoutSizingVertical = "FILL"`. This ensures both content blocks share the same visual midline.
-
----
-
-## Fidelity Check Process
-
-After all slides are written, do a systematic comparison:
-
-1. **Screenshot every Figma slide** via `figma_capture_screenshot`
-2. **Screenshot every Paper slide** via Paper MCP `get_screenshot`
-3. **Compare side by side** looking for:
-   - Content clipping (text cut off)
-   - Missing content (elements not rendered)
-   - Wrong vertical positioning (centered vs bottom-aligned)
-   - Color mismatches
-   - Font/weight mismatches
-   - Spacing differences
-4. **Fix issues** by modifying Figma node properties via `figma_execute` + `figma.getNodeByIdAsync()`
-5. **Re-screenshot** to verify fixes
-
-Common fixes needed:
-- `clipsContent = false` on frames that clip children
-- `layoutSizingVertical = "HUG"` on containers that should expand
-- `primaryAxisAlignItems` adjustments (MIN vs CENTER vs MAX)
-- `itemSpacing` tweaks to match Paper's CSS gap values
-
----
-
-## Performance Benchmarks (from spike)
-
-| Operation | Time |
-|-----------|------|
-| Preflight (`return { ok: true }`) | ~7ms |
-| Font loading (10 fonts) | ~2s |
-| Simple slide (title, 5 nodes) | ~15s |
-| Complex slide (20+ nodes) | ~25s |
-| Full 19-slide deck | ~15 min |
-| Screenshot (per slide) | instant |
-| Fidelity check + fixes | ~10 min |
-
-Total for a 19-slide deck: ~25 minutes (export + fidelity pass).
+1. Screenshot every Figma slide via `mcp__claude_ai_Figma__get_screenshot`
+2. Screenshot every Paper slide via Paper MCP `get_screenshot`
+3. Compare side by side for: clipping, missing content, wrong positioning, color/font mismatches, spacing differences
+4. Fix via `use_figma` with `figma.getNodeByIdAsync()` to target specific nodes
+5. Re-screenshot to verify
 
 ---
 
@@ -340,28 +281,14 @@ Total for a 19-slide deck: ~25 minutes (export + fidelity pass).
 
 - One Figma page with one frame per slide at presentation dimensions
 - Editable text layers with correct fonts
-- Auto-layout frames matching Paper's flex-based structure
-- Named layers matching Paper's content hierarchy
+- Auto-layout frames matching the deck's flex-based structure
+- Named layers matching the content hierarchy
 - Real color fills (not flattened rasters)
-- Absolute-positioned footers matching Paper's layout
-- All content visible and un-clipped
+- When available: design system components and variables reused from the file's existing library
 
-## What This Does NOT Produce
+## What This Does NOT Produce (yet)
 
 - Pixel-perfect rendering (Figma and Paper use different text engines)
-- Auto-layout that perfectly mirrors every CSS flex nuance
-- Figma components or variants (slides are flat frame hierarchies)
-- Design tokens or variables (colors/fonts are per-node)
-- Images (image fills would need separate `figma_set_image_fill` calls)
-- Speaker notes, animations, or slide ordering
-
----
-
-## Dependencies
-
-- Figma Desktop app (not web)
-- Figma Console MCP server (`npx figma-console-mcp@latest`)
-- Desktop Bridge plugin (`~/.figma-console-mcp/plugin/manifest.json`)
-- Figma personal access token (in MCP env config)
-- Fonts used in Paper installed locally
-- Paper MCP (already installed, `localhost:29979`)
+- Images (image support coming in future Figma MCP updates)
+- Speaker notes, animations, or slide transitions
+- Figma components or variants from scratch (slides are frame hierarchies unless building from existing components)
