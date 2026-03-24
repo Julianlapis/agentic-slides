@@ -372,6 +372,25 @@ create_artboard → update_styles(top, left) → write content → next slide
 
 ---
 
+## 2026-03-24: FATAL — All phase gates skipped. Copy blandified.
+
+**What happened:** Julian asked to build a v2 deck from narrative-v7.md (The Imitation Premium, 1,582 words, voice-checked at 38/50, distilled from 6 versions and 2 courtroom rounds). Instead of running Phase 1 (content structuring with AskUserQuestion gate), the essay was read in context and slide copy was written directly into Paper artboards. No content markdown file was created. No slide breakdown was presented for approval. No extraction discipline was followed. No anti-blandification check. No voice check on the deck copy specifically.
+
+**The result:** 16 slides of flattened summaries. Physical verbs replaced by neutral language. Cascading rhythms ("A pirated highlight became an on-ramp. A remix started a conversation. Each unauthorized clip invited someone new into a world that rewards knowledge: matchups, trades, player histories, draft picks") compressed to single generic sentences. Two-column layouts defaulted to "summary left, evidence right" instead of lifting distinct lines from the source. Julian's voice was stripped.
+
+**Root cause:** The gates were skipped because the task felt straightforward ("I already have the essay, just put it on slides"). That confidence is exactly when the gates matter most. Summarization reflex kicks in whenever there's no structured extraction step forcing line-by-line selection from the source.
+
+**The rules (now encoded in SKILL.md):**
+
+1. **Phase 1 is mandatory for every build.** No exceptions. "I already read the source" is not an exception.
+2. **AskUserQuestion must present the slide breakdown before any artboard is created.** The user approves which lines go on which slides.
+3. **Extract, don't summarize.** Headlines and body copy are lifted verbatim from the source. If shortening is needed, cut words from the original line. Don't rephrase.
+4. **Source attribution per slide.** Every slide in the content file notes which source paragraphs it draws from. If a slide has no source attribution, it's invented copy.
+5. **Anti-blandification check.** After extraction, compare each slide against its source: lost a physical verb? Flattened a rhythm? Cut a name/number? Replaced voice with neutral summary? Fix before building.
+6. **Self-check before first artboard:** Does a content markdown file exist? Did the user approve it? Does every slide trace to source lines? If any answer is no, go back to Phase 1.
+
+---
+
 ## 2026-03-22: ALWAYS build in Paper first. Figma is export only.
 
 **What happened:** Paper MCP wasn't immediately connected. Instead of reconnecting Paper, launched Figma Desktop and attempted to build the deck in Figma Slides. Julian flagged this as wrong. Paper is the primary design tool. Figma is a last resort or an export destination.
