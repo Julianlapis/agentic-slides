@@ -79,12 +79,18 @@ Read the complete copy across ALL slides. Score the full deck on 5 dimensions (1
 | Earned payoff | Does the closer feel like a conclusion the deck built toward? | The last slide uses language or concepts seeded earlier. Nothing arrives cold. |
 | Specificity | Are claims grounded in concrete details, or floating as abstractions? | Named platforms, named roles, named workflows. No vague "the industry" or "teams everywhere." |
 
-**Below 35/50 for the full deck: restructure before delivering.**
+| Headline Narrative | Can you read just the headlines in order and follow the argument? | Every transition shares language or logic with its neighbor. No cold introductions of new concepts. A stranger reading headlines alone gets the full arc. |
+
+**Below 35/50 (or 42/60 with Headline Narrative) for the full deck: restructure before delivering.**
+
+### Headline Connection Sub-Score
+
+Score each headline-to-headline transition (1-10): does headline B follow naturally from headline A? Shared language, logical progression, or emotional continuity all count. Below 6 on any transition: rewrite one or both headlines to create a bridge. The test: read the headlines aloud in sequence. Any moment where you'd pause and think "wait, how did we get here?" is a broken transition.
 
 ### Agent Prompt Template
 
 ```
-You are a Narrative Flow Agent. Score the full deck on 5 dimensions (1-10): Single-mindedness, Redundancy, Logical arc, Earned payoff, Specificity.
+You are a Narrative Flow Agent. Score the full deck on 6 dimensions (1-10): Single-mindedness, Redundancy, Logical arc, Earned payoff, Specificity, Headline Narrative.
 
 Below 7 on any dimension: flag with specific slides and fixes.
 Below 35/50 total: restructure.

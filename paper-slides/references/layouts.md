@@ -382,6 +382,148 @@ Closing slide. Bookends the deck with the title slide.
 
 ---
 
+## Strategy Framework Layouts (from TMS Strategy)
+
+These patterns come from the TMS Strategy template system. They're built for strategy decks: roadmaps, frameworks, journeys, projections. Each one encodes a specific strategic argument in its spatial structure.
+
+---
+
+### T. Growth Stairs
+
+Ascending blocks that visualize crawl-walk-run progression. The growth is the argument.
+
+**Content shape:** 3-4 sequential phases that represent increasing scale, maturity, or investment.
+
+**When to use:** Crawl-walk-run progressions, roadmaps, capability maturity models, phased investment plans. Any content showing sequential growth or expansion over time.
+
+**Structure:**
+- Eyebrow + headline + body text in the top-left quadrant
+- Bottom section: 3-4 blocks ascending left to right, each progressively taller and wider
+- Smallest block anchored bottom-left, largest anchored bottom-right
+- Each block contains a phase label (centered)
+- Blocks use a darker fill (accent color or dark gray) against the slide background
+- Optional: body text in the top-right providing context
+
+**Key design rule:** The ascending scale creates the argument visually. The growth is the point. Don't undermine it with equal-sized containers.
+
+---
+
+### U. Phase Cards
+
+Discrete containers for time-bound workstreams. Each card is a self-contained unit.
+
+**Content shape:** 2-4 parallel time-bound chunks that each contain a list of deliverables or actions.
+
+**When to use:** Multi-phase plans, year-over-year objectives, workstream breakdowns. Content with 2-4 parallel time-bound chunks that each contain a list of deliverables or actions.
+
+**Structure:**
+- Top half: eyebrow + headline (left) + body paragraph (right), split layout
+- Bottom half: 2-4 equal-width cards with rounded corners and subtle fill (light gray or tinted)
+- Each card has: bold phase label top-left, bullet list of items below
+- Cards sit in a horizontal row with small gaps (8-12px)
+- Cards take up roughly 50-60% of slide height
+
+**Key design rule:** Cards should feel like discrete containers, not just columns. The rounded corners and fill differentiate this from a flat multi-column layout.
+
+---
+
+### V. Journey Matrix
+
+Stages as columns, dimensions as rows. A framework for mapping customer movement.
+
+**Content shape:** Stages as columns and dimensions as rows. Content that maps behavior, channels, or touchpoints across a journey.
+
+**When to use:** Customer journeys, funnel mapping, channel strategy across stages. Content with stages as columns and dimensions as rows.
+
+**Structure:**
+- Eyebrow + headline top-left
+- Column headers in bold across the top (e.g., Awareness, Consideration, Purchase, Loyalty)
+- Horizontal timeline/arrow connecting the stages
+- Rows below for different dimensions (labeled on the left edge)
+- Each cell contains brief text
+- Subtle horizontal dividers between rows
+
+**Key design rule:** This is a matrix, not a table. Keep cell content to 1-2 lines max. The structure communicates the framework; the content fills in the specifics.
+
+---
+
+### W. 2x2 Strategy Map
+
+Four quadrants with a synthesis point at the center. The classic strategic positioning tool.
+
+**Content shape:** Four related concepts that can be arranged in quadrants, with a central proposition tying them together.
+
+**When to use:** Strategic positioning, tension mapping, four-forces frameworks. Any content with four related concepts that can be arranged in quadrants.
+
+**Structure:**
+- Large rounded-corner container filling most of the slide
+- Divided into four quadrants by thin vertical and horizontal lines
+- Each quadrant: bold label centered, descriptive text below in muted color
+- Central element: pill/badge at the intersection point with the core proposition
+- Eyebrow + headline above the container (or subtitle below headline)
+
+**Key design rule:** The center element is the synthesis of the four quadrants. It should visually dominate the intersection.
+
+---
+
+### X. Cycle Diagram
+
+A circular process with labeled nodes. For content where the loop is the argument.
+
+**Content shape:** 3-5 steps in a continuous process that feeds back into itself.
+
+**When to use:** Iterative processes, reinforcement loops, research cycles. Any content showing a continuous process with 3-5 steps that feed back into each other.
+
+**Structure:**
+- Split layout: text left (eyebrow + headline + body), diagram right
+- Right panel: large rounded-corner container with a dashed circular path
+- 3-5 labeled nodes (circles with gradient fills) positioned along the path
+- Nodes labeled with step names
+- Dashed connectors between nodes suggesting flow direction
+
+**Key design rule:** The circle communicates "this never stops." Use it when the loop is the argument, not just the structure.
+
+---
+
+### Y. Projection Timeline
+
+An ascending curve with milestones below. Forward momentum on a time axis.
+
+**Content shape:** A growth trajectory with specific milestones along a time axis.
+
+**When to use:** Growth trajectories, launch timelines, milestone planning. Content showing forward momentum along a time axis.
+
+**Structure:**
+- Eyebrow + headline top-left
+- Ascending curve from bottom-left to top-right (can be a simple SVG path)
+- Legend or bullet list in top-right corner showing what the endpoint represents
+- Horizontal timeline axis at bottom with milestone markers (circles on a line)
+- Below each marker: bold month/date label + brief description
+- Optional: small accent block at the start showing "current state"
+
+**Key design rule:** The curve does the emotional work. The milestones below do the informational work. Don't clutter the curve area with text.
+
+---
+
+### Z. Staircase Gantt
+
+Staggered workstream blocks that build on each other over time.
+
+**Content shape:** Multiple workstreams that start at different times and layer onto each other.
+
+**When to use:** Multi-workstream timelines, capability buildout over time. Content showing parallel tracks that start at different times and grow.
+
+**Structure:**
+- Eyebrow + headline top-left
+- Ascending staircase of blocks from bottom-left to top-right
+- Each "step" is a labeled block (workstream name) with additional unlabeled blocks extending right (representing deliverables or milestones)
+- Horizontal timeline axis at the bottom with date labels
+- Blocks use gradient fills, darker for the named workstream, lighter for extensions
+
+**Key design rule:** This communicates "building on each other." Each new workstream starts where the previous one has established a foundation.
+
+---
+
 ## Adding New Patterns
 
 When analyzing a new reference deck, look for layout patterns not already in this library. A new pattern qualifies if:

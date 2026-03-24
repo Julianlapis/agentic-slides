@@ -2,6 +2,14 @@
 
 Common mistakes that make decks look amateur. Each one includes why it fails and what to do instead.
 
+## CRITICAL: Trusting create_artboard positioning
+**Why it fails:** Paper's auto-placement algorithm IGNORES the top/left values passed in create_artboard styles. Every single time. Artboards land on random rows and columns regardless of what you specify. This was violated 4+ times in a single session (2026-03-20) despite being logged after each violation.
+**Instead:** After EVERY create_artboard call, IMMEDIATELY call update_styles in the SAME response to force the correct top and left. Never batch multiple create_artboard calls. The pattern is always: create_artboard → update_styles → add content. The position formula is: `left = slide_index * 1536`, `top` = consistent for the deck row. This is non-negotiable.
+
+## CRITICAL: Batching create_artboard calls
+**Why it fails:** When you batch 3-5 create_artboard calls in parallel, Paper scatters them across the canvas. You can't fix positions until all calls return, and by then the user has seen the mess.
+**Instead:** Create ONE artboard at a time. Immediately fix its position. Then create the next. Sequential, never parallel.
+
 ## Building all slides before screenshotting
 **Why it fails:** Errors compound. A wrong font size on slide 1 gets duplicated to slides 2-10.
 **Instead:** Screenshot every 2-3 slides. Catch issues early.
