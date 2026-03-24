@@ -125,6 +125,10 @@ Design systems are additive. The user can feed in more reference decks over time
 
 Take whatever the user provides and produce the content markdown file.
 
+### Required Reading Before Writing Any Slide Copy
+
+Load [references/copy-patterns.md](paper-slides/references/copy-patterns.md) before extracting slide copy. It contains 9 patterns from Julian's actual decks showing what good slide copy looks like, plus the anti-patterns that AI consistently produces. Calibrate against these examples.
+
 ### The Core Rule: Extract, Don't Summarize
 
 The source document IS the copy. The job is to select which lines go on which slides, not to rephrase them in blander language. If a line from the source needs shortening, cut words from the line. Don't rewrite it.
