@@ -391,6 +391,16 @@ create_artboard → update_styles(top, left) → write content → next slide
 
 ---
 
+## 2026-03-25: Ran wrong scoring system. Skipped design quality pass entirely.
+
+**What happened:** Julian asked for the "4-tier scoring rubric." Ran the strategy-engine's 5-dimension content rubric (Tension/Specificity/Narrative Arc/Cultural Grounding/Persuasion) instead of the agentic-slides Phase 5 four-pass design quality system (Layout Intelligence, Design Quality, Narrative Flow, Copy Quality). The strategy rubric doesn't check typography, alignment, contrast, balance, or clipping. Result: 11 headline font size inconsistencies and a fully clipped slide (slide 10) passed through "scoring" at 43/50.
+
+**The rule:** When Julian asks for a scoring pass on a deck, run the agentic-slides Phase 5 system, not the strategy-engine rubric. The Phase 5 system screenshots every slide and checks visual quality. The strategy rubric checks argument quality. Both matter, but the design system catches clipping, font inconsistencies, and alignment issues that the strategy rubric is blind to. Run Phase 5 FIRST (it catches visible failures), then strategy rubric if the copy also needs evaluation.
+
+**Also: Paper text wrapping is unreliable.** Impact condensed at 56px+ on single-line text nodes frequently overflows the artboard regardless of `white-space: pre-wrap`, `max-width`, or `width` constraints. The ONLY reliable fix is wrapping the text in a frame with an explicit `width` AND using `justify-content: flex-end` / `align-items: flex-start` (not center). Centered layouts with long Impact headlines will clip. Screenshot every slide that has a headline longer than 6 words at 56px+.
+
+---
+
 ## 2026-03-22: ALWAYS build in Paper first. Figma is export only.
 
 **What happened:** Paper MCP wasn't immediately connected. Instead of reconnecting Paper, launched Figma Desktop and attempted to build the deck in Figma Slides. Julian flagged this as wrong. Paper is the primary design tool. Figma is a last resort or an export destination.
