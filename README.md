@@ -25,6 +25,10 @@ The combo: **teach it a design language, then build decks in it.**
 
 **For building decks in Figma:**
 - [Figma MCP server](https://www.figma.com/developers/mcp) configured in Claude Code
+- The skill refers to Figma tools as `mcp__<your-figma-server>__use_figma` etc. — the prefix depends on what you named the server; Claude resolves it
+
+**For ingesting PPTX files (optional):**
+- `pip install markitdown python-pptx`
 
 `/reference-builder` needs nothing beyond Claude Code itself.
 

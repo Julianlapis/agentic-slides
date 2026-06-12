@@ -1,6 +1,6 @@
 ---
 name: reference-builder
-description: Build exhaustive, machine-readable reference documents from external sources. Point it at games, products, brands, design systems, artists, or movements — it researches everything and produces structured reference folders. Works standalone. Feeds into /arc, /strategy-engine, or anything else. Trigger when asked to "build references", "research visual inspiration", "compile a mood board", "gather audio references", or "create a reference doc".
+description: Build exhaustive, machine-readable reference documents from external sources. Point it at games, products, brands, design systems, artists, or movements — it researches everything and produces structured reference folders. Works standalone. Feeds into /agentic-slides or any other workflow. Trigger when asked to "build references", "research visual inspiration", "compile a mood board", "gather audio references", or "create a reference doc".
 metadata:
   trigger: Building reference documents, visual research, audio research, design system analysis, inspiration gathering, mood board compilation
   author: Julian Alexander
@@ -14,7 +14,7 @@ Build exhaustive, machine-readable reference documents by dispatching parallel r
 
 You give it subjects (games, brands, products, artists, movements, design systems). It asks what you care about, then launches one research agent per subject in parallel. Each agent crawls the web and produces a structured markdown reference document with links to source material.
 
-The output is a folder of `.md` files designed to be consumed by other agents — Arc skills, strategy-engine, or any workflow that needs grounded creative/technical references.
+The output is a folder of `.md` files designed to be consumed by other agents — /agentic-slides, or any workflow that needs grounded creative/technical references.
 
 ## Process
 

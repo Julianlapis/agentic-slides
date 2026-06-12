@@ -1,6 +1,6 @@
 ---
 name: agentic-slides
-description: Build production-quality presentation decks in Figma (default) or Paper from any source material. Use when the user wants to create slides, a deck, or a presentation. Handles content distillation, visual design, layout variety, copy quality, and export. Trigger when the user mentions "deck," "slides," "presentation," "pitch deck," or "conference talk." Also trigger when the user pastes or references ANY content (outline, doc, article, transcript, notes, URL) and wants it turned into something visual. Even if they don't say "slides" explicitly, if they have content that could become a multi-slide deck, use this skill. Figma is the default canvas. If the user says "in Paper" or explicitly requests Paper, use the Paper canvas path instead.
+description: Build production-quality presentation decks in Paper (default) or Figma from any source material. Use when the user wants to create slides, a deck, or a presentation. Handles content distillation, visual design, layout variety, copy quality, and export. Trigger when the user mentions "deck," "slides," "presentation," "pitch deck," or "conference talk." Also trigger when the user pastes or references ANY content (outline, doc, article, transcript, notes, URL) and wants it turned into something visual. Even if they don't say "slides" explicitly, if they have content that could become a multi-slide deck, use this skill. Paper is the default canvas. If the user says "in Figma" or provides a Figma URL, use the Figma canvas path instead.
 ---
 
 # Agentic Slides
@@ -87,7 +87,7 @@ A markdown file containing all deck content, structured by slide. This file is t
 
 Reference this file throughout the build. When context gets long, re-read it rather than relying on memory.
 
-**Handoff contract with strategy-engine:** If the content file was produced by `/strategy:narrative`, it arrives finalized: voiced, role-audited, anti-blandification checked. Agentic-slides compresses for visual constraints (word budgets per layout type) and validates narrative comprehension in rendered form. It does not rewrite for strategic quality. If a headline doesn't argue or a body restates the headline, flag it back to the user rather than rewriting. Strategy-engine owns "does the argument work?" Agentic-slides owns "does the argument survive the canvas?"
+**Handoff contract with upstream narrative tools:** If the content file was produced by a narrative-authoring workflow, treat it as finalized: voiced, role-audited, anti-blandification checked. Agentic-slides compresses for visual constraints (word budgets per layout type) and validates narrative comprehension in rendered form. It does not rewrite for strategic quality. If a headline doesn't argue or a body restates the headline, flag it back to the user rather than rewriting. The authoring stage owns "does the argument work?" Agentic-slides owns "does the argument survive the canvas?"
 
 ### 2. Design System (REQUIRED, with default fallback)
 
@@ -117,8 +117,8 @@ Design systems are additive. The user can feed in more reference decks over time
 
 ### Figma
 1. **Get the file key.** Extract from the Figma URL (`figma.com/design/:fileKey/...`) or ask the user.
-2. **`mcp__claude_ai_Figma__get_metadata`** — Understand file structure, pages, existing components.
-3. **`mcp__claude_ai_Figma__search_design_system`** — Check for existing design system components, variables, and styles to reuse.
+2. **`mcp__<your-figma-server>__get_metadata`** — Understand file structure, pages, existing components.
+3. **`mcp__<your-figma-server>__search_design_system`** — Check for existing design system components, variables, and styles to reuse.
 4. **Test `use_figma` access** — Run a simple probe: `return { ok: true, timestamp: Date.now() }`.
 5. **Confirm both inputs.** Content file exists? Design system identified? If not, create them.
 
@@ -130,7 +130,7 @@ Before starting the phase sequence, check what already exists.
 
 **Check for existing deck state:**
 - Paper: `get_basic_info` (are there artboards already?)
-- Figma: `mcp__claude_ai_Figma__get_metadata` (are there slide frames in the target file?)
+- Figma: `mcp__<your-figma-server>__get_metadata` (are there slide frames in the target file?)
 
 **Check for content file:**
 ```bash
@@ -177,7 +177,7 @@ Take whatever the user provides and produce the content markdown file.
 
 The source document IS the copy. The job is to select which lines go on which slides, not to rephrase them in blander language. If a line from the source needs shortening, cut words from the line. Don't rewrite it.
 
-**Why this rule exists:** In the 2026-03-24 Imitation Premium session, a 1,582-word essay (voice-checked at 38/50, distilled from 6 versions and 2 courtroom rounds) was turned into slide copy that "bland-ified" the source. Physical verbs were replaced with neutral summaries. Rhythmic cascades ("A pirated highlight became an on-ramp. A remix started a conversation. Each unauthorized clip invited someone new into a world that rewards knowledge") were flattened to single generic sentences. The sharpness that took 5 sessions to build was lost in one pass because the skill summarized instead of extracting.
+**Why this rule exists:** In a 2026-03-24 essay-to-deck session, a 1,582-word essay (voice-checked at 38/50, distilled from 6 versions and 2 courtroom rounds) was turned into slide copy that "bland-ified" the source. Physical verbs were replaced with neutral summaries. Rhythmic cascades ("A pirated highlight became an on-ramp. A remix started a conversation. Each unauthorized clip invited someone new into a world that rewards knowledge") were flattened to single generic sentences. The sharpness that took 5 sessions to build was lost in one pass because the skill summarized instead of extracting.
 
 ### Input Types
 
@@ -361,14 +361,14 @@ Each slide is one `use_figma` call containing Plugin API JavaScript. The tool ta
 3. Use `await figma.loadFontAsync({ family, style })` before setting text content.
 4. Use `await figma.getNodeByIdAsync()` (not `figma.getNodeById()`) for dynamic page access.
 
-**Search for existing components first.** Before building from scratch, call `mcp__claude_ai_Figma__search_design_system` to find reusable components in the user's design system. Import matches via `importComponentByKeyAsync` instead of recreating them.
+**Search for existing components first.** Before building from scratch, call `mcp__<your-figma-server>__search_design_system` to find reusable components in the user's design system. Import matches via `importComponentByKeyAsync` instead of recreating them.
 
 #### Building Order
 1. Create page → load fonts
 2. Build slide frame with auto-layout (VERTICAL, fixed size)
 3. Add content frame (layoutGrow: 1) + footer
 4. Add text and visual elements
-5. Screenshot via `mcp__claude_ai_Figma__get_screenshot` every 2-3 slides
+5. Screenshot via `mcp__<your-figma-server>__get_screenshot` every 2-3 slides
 6. Self-healing: compare screenshot against intent, fix mismatches
 
 #### CSS → Figma Property Reference
@@ -412,7 +412,7 @@ Launch all four as parallel background agents. Synthesize reports. Apply fixes i
 
 **Screenshots by canvas:**
 - Paper: `get_screenshot` from Paper MCP
-- Figma: `mcp__claude_ai_Figma__get_screenshot` with the file key and node ID
+- Figma: `mcp__<your-figma-server>__get_screenshot` with the file key and node ID
 
 Full scoring rubrics, agent prompt templates, and the complete stop-slop checklist are in [references/quality-system-v2.md](references/quality-system-v2.md).
 
@@ -428,7 +428,7 @@ gate (clarity v1.2)  →  source-verifier  →  pressure-tester (conditional)  �
 
 **2. Source-verifier.** `python3 scripts/source-verifier.py <run_dir>`. Parallel WebFetch on URL'd citations (`ThreadPoolExecutor`, max_workers=10). Verbatim dossier match on named-author quotes. Numeric precision check against dossier. Loads `memory/known-failure-mechanisms.json` (skill-level scope only — project-level patterns flow to Expert prompt, not here. See v2-pipeline.md §source-verifier-scope). Halt on confirmed quote mismatch OR URL 404.
 
-**3. Rewrite pressure-tester (conditional).** Follow [scripts/rewrite-pressure-tester.md](scripts/rewrite-pressure-tester.md). Run `scripts/inferential-detector.py --aggregate <run_dir>/aggregate.json` (regex layer: causal verbs + standing assertions). For rewrites the regex did NOT flag, dispatch the `agents/inferential-detector.md` agent (named-entity novelty check). Qualifying rewrites get a 2-pass `strategy:pressure-test:pressure-test-critic`. Halt is **orchestrator-enforced** when Pass 2 confirms Pass 1 (v2-pipeline.md §halt-enforcement-class).
+**3. Rewrite pressure-tester (conditional).** Follow [scripts/rewrite-pressure-tester.md](scripts/rewrite-pressure-tester.md). Run `scripts/inferential-detector.py --aggregate <run_dir>/aggregate.json` (regex layer: causal verbs + standing assertions). For rewrites the regex did NOT flag, dispatch the `agents/inferential-detector.md` agent (named-entity novelty check). Qualifying rewrites get a 2-pass adversarial critique using [agents/pressure-test-critic.md](agents/pressure-test-critic.md). Halt is **orchestrator-enforced** when Pass 2 confirms Pass 1 (v2-pipeline.md §halt-enforcement-class).
 
 **4. Auto-applier (stage-only at v2 launch).** `python3 scripts/auto-applier.py <run_dir>`. Pre-flight asserts `sha256(deck) == manifest.deck_snapshot_sha256` — halt on drift. Writes `pending-apply.diff` to the run dir; does NOT modify the canonical deck until `LIVE_APPLY = True` is flipped. Promotion checklist in v2-pipeline.md §auto-applier-promotion.
 

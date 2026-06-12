@@ -2,15 +2,15 @@
 
 Deduction-based scoring for agentic-slides. Every point is tied to a countable, verifiable pattern. No 1-10 subjective scales. Start at max, subtract for violations found. Every deduction cites a specific slide and a specific rule. Two agents scoring the same deck should arrive within 3 points of each other.
 
-Modeled on voice-scoring.md. Same mechanics: per-instance costs, caps, free budgets, violation gates.
+Mechanics: per-instance costs, caps, free budgets, violation gates.
 
-> **This rubric is the STANDARD layer.** It is operationalized by the `deck-score` workflow (`~/.claude/workflows/deck-score.js`, fired at Phase 5.1 per feedback entry PS-065). The workflow's agents read this file live — **edit here to raise the bar; the workflow mechanism stays stable.** Standard (this file) and mechanism (the workflow) are separate on purpose.
+> **This rubric is the STANDARD layer.** Scoring agents read this file live — **edit here to raise the bar.** Standard (this file) and mechanism (the agents that apply it) are separate on purpose.
 
 Run all four passes after every round of content changes. Mandatory before presenting work to the user.
 
 **Critique-driven iteration:** For existing decks that need improvement, run /critique first to get a prioritized issue list. Then modify in place rather than rebuilding.
 
-**Voice layers:** Agentic-slides output is client-facing. Apply both Layer 1 (`~/.claude/voice-dna.md`) and Layer 2 (`~/.claude/copy-polish.md`) during Pass 4.
+**Voice layers (optional):** If you maintain your own voice/style guide files, apply them during Pass 4. The Pass 4 checks below are self-contained without them.
 
 ---
 
@@ -23,7 +23,7 @@ Four scores, same deduction mechanic:
 | Layout Intelligence | /50 | Layout selection, variety, rhythm, pacing |
 | Design Quality | /50 | Visual execution per slide |
 | Narrative Flow | /60 | Argument structure across the deck |
-| Copy Quality | /50 | Writing quality per voice-dna and copy-polish rules |
+| Copy Quality | /50 | Writing quality per the Pass 4 rubric |
 
 ### Deck size normalization
 
@@ -38,9 +38,9 @@ All per-instance violation costs apply at these density thresholds:
 
 "Free" means the violation is logged and reported but costs 0 points. Prevents small decks from inflating and large decks from deflating.
 
-The budget applies **per layer**, not per pass or globally. A 16-slide deck gets 4 free violations in L1 AND 4 free in L2, etc. This matches voice-scoring.md's architecture.
+The budget applies **per layer**, not per pass or globally. A 16-slide deck gets 4 free violations in L1 AND 4 free in L2, etc. This per-layer architecture keeps deductions local and auditable.
 
-**Exemption:** Presence checks (Pass 1 L3, Pass 2 L3, Pass 4 L5) are binary and exempt from the free budget, same as voice-scoring L4.
+**Exemption:** Presence checks (Pass 1 L3, Pass 2 L3, Pass 4 L5) are binary and exempt from the free budget.
 
 ### Violation count gate
 
@@ -244,13 +244,13 @@ Cover all body copy. Read ONLY headlines in sequence. Binary test.
 
 ## PASS 4: COPY QUALITY (50 points)
 
-**Agent: `voice-review`** (`~/.claude/agents/voice-review.md`). Reads voice-dna.md and copy-polish.md fresh from disk. This pass incorporates both Voice and Polish checks from voice-scoring.md, adapted for deck copy.
+**Agent:** spawn a fresh-context copy-review subagent with the layers below as its rubric. This pass covers both voice identity and clarity checks, adapted for deck copy.
 
 **Gestalt question (mandatory):** After all layers, the reviewer answers: "Could any AI tool have generated this deck without human editorial judgment?" If yes AND L5 "point of view" fails, the deck auto-fails Pass 4 regardless of numeric score.
 
 ### Layer 1: Mechanical (0-18 points at risk)
 
-Same as voice-scoring.md Voice L1. Count per-instance violations:
+Count per-instance violations:
 
 | Violation | Cost | Cap |
 |-----------|------|-----|
@@ -282,25 +282,25 @@ Slide copy must earn every word.
 
 ### Layer 3: Cadence and Rhythm (0-10 points at risk)
 
-Adapted from voice-scoring.md Voice L2 for deck copy.
+Cadence and register checks adapted for deck copy.
 
 | Pattern | Test | Cost |
 |---------|------|------|
-| Manifesto cadence | Count slide-final sentences. If >60% are punchy declaratives (under 10 words), quotable kickers (screenshot-worthy), or tricolon closers (three parallel items). Threshold is 60% (vs. voice-scoring's 50%) because deck copy has more natural kickers per slide. | -3 |
+| Manifesto cadence | Count slide-final sentences. If >60% are punchy declaratives (under 10 words), quotable kickers (screenshot-worthy), or tricolon closers (three parallel items). Threshold is 60% because deck copy has more natural kickers per slide. | -3 |
 | Manifesto cadence (severe) | If >75%: | -5 (replaces -3) |
 | Metronomic rhythm | 3+ consecutive sentences within 2 words of each other in length, within a single slide's body copy | -2 per instance, cap -4 |
-| Repeated phrase | Same phrase (4+ words) appears in body copy of 3+ different slides. Threshold is 3 slides (vs. voice-scoring's 2 sections) because slides are shorter units; repetition across 2 short slides is less noticeable than across 2 long sections. | -2 per instance, cap -4 |
+| Repeated phrase | Same phrase (4+ words) appears in body copy of 3+ different slides. Threshold is 3 slides because slides are shorter units; repetition across 2 short slides is less noticeable. | -2 per instance, cap -4 |
 
 **Layer cap: -10.**
 
 ### Layer 4: Register and Polish (0-12 points at risk)
 
-Combines voice-scoring Voice L3 and key Polish checks.
+Voice-authenticity and clarity checks combined.
 
 | Violation | Cost | Cap |
 |-----------|------|-----|
-| Register break | Sentence is formally or informally mismatched with the deck's established register. A deliberate register shift (colloquial line after formal passage, per voice-dna) is not a break. A break feels accidental, like a different author wrote that line. | -2 per instance | -4 |
-| Consultant phrase (copy-polish banned list) | -2 per instance | -6 |
+| Register break | Sentence is formally or informally mismatched with the deck's established register. A deliberate register shift (colloquial line after formal passage) is not a break. A break feels accidental, like a different author wrote that line. | -2 per instance | -4 |
+| Consultant phrase ("leverage," "utilize," "streamline," "robust," "seamless," "holistic") | -2 per instance | -6 |
 | Unexpanded acronym on first use | -1 per instance | -3 |
 | Overloaded sentence (2+ distinct ideas joined by "and," "but," "which," or comma splice) | -1 per instance | -3 |
 | Qualifier surviving ("somewhat," "relatively," "arguably," "to some extent") | -1 per instance | -3 |
@@ -313,7 +313,7 @@ Binary checks. Exempt from free budget.
 
 | Marker | Test | Cost if absent |
 |--------|------|---------------|
-| Physical verbs | Fewer than 1 per 300 words in deck body copy ("sanded down," "bolted on," "stripped back," "wired," etc.). Matches voice-scoring.md canonical threshold. | -2 |
+| Physical verbs | Fewer than 1 per 300 words in deck body copy ("sanded down," "bolted on," "stripped back," "wired," etc.). | -2 |
 | Register shifts | Deck body copy (500+ words) has fewer than 2 natural register shifts (a colloquial line after a formal passage, or vice versa) | -2 |
 | Specificity | Any content slide lacks a specific number, name, or concrete detail | -1 per slide, cap -3 |
 | Point of view | Copy could describe any company in the same industry by swapping proper nouns. Nothing is specific to this client, product, or situation. | -3 |
@@ -344,18 +344,9 @@ Decks with under 400 words of total body copy are exempt from physical verbs and
 
 ---
 
-## Cross-System Routing
+## Scope
 
-When content moves through the pipeline, each system scores at its stage. They don't stack:
-
-| Stage | System | Scores |
-|-------|--------|--------|
-| Raw strategy doc (before slides) | quality-gates.md | /50 |
-| Slide-ready narrative (before deck build) | narrative-reviewer.md | /70 |
-| Final deck (built in Figma/Paper) | quality-system-v2.md | /50+/50+/60+/50 |
-| Copy at any stage | voice-scoring.md (delegated) | Voice /50 + Polish /50 |
-
-**Deduplication rule:** If two systems flag the same specific instance (e.g., an ungrounded claim scored in Pass 3 L3 and also caught by voice-scoring Polish L3 via Pass 4), charge the higher deduction only. Do not double-count the same sentence.
+This file scores the **final deck** (built in Figma/Paper). Upstream narrative documents have their own editorial pass before the deck build; copy-level checks are folded into Pass 4 here. If two layers flag the same specific instance, charge the higher deduction only — never double-count the same sentence.
 
 ## How to Apply Results
 
@@ -376,13 +367,13 @@ Skip for single-word text fixes or style-only changes (color, font size) that do
 ## Changelog
 
 - 2026-04-28: v1. Five dimensions x 1-10 subjective scales per pass.
-- 2026-04-30: v2-draft. Replaced all subjective 1-10 scales with deduction-based axioms modeled on voice-scoring.md.
+- 2026-04-30: v2-draft. Replaced all subjective 1-10 scales with deduction-based axioms.
 - 2026-04-30: v2-final. Post-review fixes from completeness and calibration reviewers:
-  (1) Free budget changed from per-pass to per-layer, matching voice-scoring.md architecture.
+  (1) Free budget changed from per-pass to per-layer.
   (2) Violation gate now scales with deck size (10/13/16/20) instead of fixed 12.
-  (3) Added gestalt override: auto-fail if assembled + no POV, matching voice-scoring.
-  (4) Added Pass 4 L3: Cadence and Rhythm (manifesto cadence, metronomic rhythm, repeated phrase) from voice-scoring Voice L2. Closes the biggest gap: rhythmically dead AI copy.
-  (5) Added Pass 4 L4: overloaded sentences and qualifiers from voice-scoring Polish L2.
+  (3) Added gestalt override: auto-fail if assembled + no POV.
+  (4) Added Pass 4 L3: Cadence and Rhythm (manifesto cadence, metronomic rhythm, repeated phrase). Closes the biggest gap: rhythmically dead AI copy.
+  (5) Added Pass 4 L4: overloaded sentences and qualifiers.
   (6) Expanded Pass 4 L5 Voice Presence: added register shifts check, raised physical verbs to 1/300 (canonical), added short-deck exemption.
   (7) Added Pass 1 L4: Pacing (front/back-loaded density, no breathing room). Restores v1's pacing check.
   (8) Sharpened ambiguous tests: density class definitions table, thematic section definition, multi-idea disambiguation, alignment lane clarification, dead zone exemption for sparse layouts, headline contrast using WCAG AA Large Text (3:1), register break vs. deliberate shift guidance, detail-vs-elaboration exemption for emphasis restatements.

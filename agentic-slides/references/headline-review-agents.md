@@ -18,7 +18,7 @@ Two mandatory sub-agents that run during Phase 5 (Quality System) of every agent
 
 **Purpose:** Test whether the eyebrows + headlines alone tell the full story.
 
-**IMPORTANT:** Include eyebrows (the small label text above each headline, e.g. "01 / BRAND STRATEGY", "THE KEY PROBLEM", "DESIGN PRINCIPLE 1"). Eyebrows provide wayfinding context that is critical to following the argument. A headline like "The bet is proof of instinct, and the win is the bonus" reads differently under "THE KEY INSIGHT" than it does under "PRODUCT STRATEGY." Always extract and include eyebrows alongside headlines.
+**IMPORTANT:** Include eyebrows (the small label text above each headline, e.g. "01 / BRAND STRATEGY", "THE KEY PROBLEM", "DESIGN PRINCIPLE 1"). Eyebrows provide wayfinding context that is critical to following the argument. A headline like "The morning run is the meeting that can't be moved" reads differently under "THE KEY INSIGHT" than it does under "PRODUCT STRATEGY." Always extract and include eyebrows alongside headlines.
 
 **Prompt template:**
 
@@ -107,8 +107,8 @@ After writing all headlines, score every A→B transition (1-10): does B follow 
 Slides that unveil a new concept must name that concept in the headline. The example drops to the body.
 
 Two headline types:
-1. **Unveiling slides** (introduce a new idea): headline NAMES the concept simply. Examples: "Back yourself, everywhere." / "The bet is proof of instinct, and the win is the bonus."
-2. **Supporting slides** (back up a claim): headline explains WHY or HOW. Example: "Every competitor sells the fantasy of winning harder, and that's exactly why they can't follow us here."
+1. **Unveiling slides** (introduce a new idea): headline NAMES the concept simply. Examples: "Own the morning, everywhere." / "The morning run is the meeting that can't be moved."
+2. **Supporting slides** (back up a claim): headline explains WHY or HOW. Example: "Every competitor sells performance, and that's exactly why they can't sell belonging."
 
 **Test:** After writing a headline, ask: "Does this name a new idea, or describe an example of one?" If it's an example, rewrite.
 

@@ -4,7 +4,7 @@ Run all four passes in parallel after every round of content changes. This is ma
 
 **Critique-driven iteration:** For existing decks that need improvement, run /critique first to get a prioritized issue list. Then modify in place rather than rebuilding. The critique output maps directly to targeted modifications. This workflow (critique -> targeted modifications) is the default for deck iteration, not "rebuild the whole thing."
 
-**Voice layers:** Agentic-slides output is client-facing. Apply both Layer 1 (`~/.claude/voice-dna.md`, identity) and Layer 2 (`~/.claude/copy-polish.md`, plain language + directness) during the Copy Quality pass.
+**Voice layers (optional):** If you maintain your own voice/style guide files, apply them during the Copy Quality pass. Otherwise the checks defined in Pass 4 below are self-contained.
 
 ---
 
@@ -127,7 +127,7 @@ Output: formula computation per dimension, score, total, and specific fixes.
 
 ## Pass 4: Copy Quality
 
-**Agent: `voice-review`** (`~/.claude/agents/voice-review.md`). Invoke this named agent, do not improvise a subagent from scratch. The agent reads voice-dna.md and copy-polish.md fresh from disk. Model: opus (set in agent frontmatter).
+**Agent:** spawn a fresh-context copy-review subagent that receives ONLY the deck copy plus the rules in this pass (and your own voice guide files, if you keep any). Fresh context prevents long-session decay from softening the checks.
 
 Score the full deck copy on 5 dimensions (1-10).
 
@@ -157,7 +157,7 @@ Score the full deck copy on 5 dimensions (1-10).
 
 **Below 35/50: revise before delivering.**
 
-Run against `~/.claude/voice-dna.md` (identity) and `~/.claude/copy-polish.md` (clarity). The voice-review agent catches every violation in a single pass: mechanical violations (banned phrases, em dashes, adverbs, staccato, false agency) plus judgment calls (rhythm, register, voice authenticity, narrative density).
+Run against your own voice/style guides if you keep them; otherwise the rules in this pass are the rubric. The review subagent catches every violation in a single pass: mechanical violations (banned phrases, em dashes, adverbs, staccato, false agency) plus judgment calls (rhythm, register, voice authenticity, narrative density).
 
 Detailed rules, banned phrases, and structures to avoid are in the canonical sources. Do not duplicate them here.
 

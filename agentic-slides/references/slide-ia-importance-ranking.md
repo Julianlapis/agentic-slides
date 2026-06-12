@@ -21,9 +21,9 @@ Rank to find P1, then strip toward it.
 
 Importance stays a **judgment** — this framework does not compute it. What it does is make the judgment *defensible*: every element has to justify itself against the argument, not against taste or how much work it was to make. The unit of that judgment is an element's **distance from the spine**.
 
-The spine is the project's **strategy atom** — the `differentiator → positioning → activation` chain, defined canonically in `~/Projects/studio-v2/plugins/strategy/references/spine.md`. It is named *per project*, never hardcoded here. Name the spine before ranking anything; every element either advances a link, proves one, or decorates around it.
+The spine is the project's **strategy atom** — the `differentiator → positioning → activation` chain. It is named *per project*, never hardcoded here. Name the spine before ranking anything; every element either advances a link, proves one, or decorates around it.
 
-*(Illustration — one pitch deck's spine: founding science → a contrarian investment thesis → the brand architecture. This is an example of the shape, not a definition baked into this reference.)*
+*(Illustration — one deck's spine: an origin story → a contrarian category thesis → the brand architecture. This is an example of the shape, not a definition baked into this reference.)*
 
 > **Wiring note (spine consolidation 2026-06-01):** these IA files are read as text into context — there is no parameter slot. How the *current* project's spine reaches this file at runtime (pre-processing substitution vs. a second verifier-manifest read of `spine.md`) is the open mechanism decision deferred to the spine-wiring phase. Until then, name the spine inline before ranking.
 
@@ -44,9 +44,9 @@ Tag with the machine code; think in the human word.
 Tag inline at the end of each beat in the narrative MD. Add the axiom for P1s so the spine link is explicit:
 
 ```
-- The firm shows up in eighteen places and registers in none. {P1:differentiator}
-- 18-logo satellite wall {P2}
-- ambient royal gradient on the divider {P3}
+- The brand shows up in twelve channels and registers in none. {P1:differentiator}
+- 12-logo satellite wall {P2}
+- ambient gradient on the divider {P3}
 ```
 
 A workflow reading the MD can then compute a cut deterministically and report what it dropped.
@@ -89,7 +89,7 @@ This is also the "one viz zoomed at different altitudes" pattern: don't build se
 
 ## IA-health diagnostic (compression-readiness)
 
-Run this before any compression, and as a deck-score companion. It finds slides that will *resist* clean cutting:
+Run this before any compression, and as a scoring companion. It finds slides that will *resist* clean cutting:
 
 - **Structural slides are exempt — tag them `{STRUCT}`, never rank them.** Dividers, section bridges, and not-yet-authored placeholders carry pacing and navigation, not argument. They have no P1 by design. Skip them in the diagnostic and never feed them to a content-cut. This exemption is for the *machine*: a human knows not to cut a divider; an agent running the law literally needs it said. (A divider can still be cut as a whole-section decision at the deck altitude — that's a pacing call, not an IA-health failure.)
 - **Every content slide should have exactly one clear P1.** That P1 is the slide's reason to exist.
@@ -113,11 +113,11 @@ A deck whose every slide has one spine-linked P1 compresses surgically. A deck w
 
 - Any "condense this deck / cut to N minutes / make this shorter" task at the slide or section level.
 - Before authoring a deck that will later need to flex to multiple lengths (rank as you build; compression becomes free).
-- As a deck-score companion (IA-health pass) before a quality run.
+- As an IA-health pass before a quality run.
 - Whenever the instinct is to "tighten everything" — that instinct is the failure mode; rank and subtract instead.
 
 ## Relationship to neighbors
 
 - **`copy-compression.md`** — the line altitude. Selection inside one element. This reference hands off to it at the bottom zoom.
 - **`quality-system-v2.md`** — scores finished quality. IA-health is the pre-compression structural check that makes a deck *cuttable* before it's scored.
-- **The project spine (strategy atom)** — the north star that makes ranking objective rather than taste. No spine named = no valid ranking. Name the spine first. Canonical definition: `~/Projects/studio-v2/plugins/strategy/references/spine.md`.
+- **The project spine (strategy atom)** — the north star that makes ranking objective rather than taste. No spine named = no valid ranking. Name the spine first.

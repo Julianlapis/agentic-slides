@@ -6,7 +6,7 @@
 
 The same headline feedback kept recurring across sessions. The rule kept getting lost because it was **scattered across multiple files (one deprecated), and nothing forced it to run when headlines were built or edited.** It only ran when the user caught a bad headline by hand.
 
-The fix is not a new mode. It is: **one home, auto-fired.** This gate is that home. It mirrors how `/write:voice` auto-invokes at the end of every `/write` sub-skill — you never have to remember it.
+The fix is not a new mode. It is: **one home, auto-fired.** This gate is that home. It auto-fires whenever headlines are built or edited — the same pattern as a voice gate that runs at the end of every writing sub-skill — you never have to remember it.
 
 ## The forcing rule (READ THIS FIRST)
 
@@ -36,13 +36,13 @@ A stranger landing on this one slide, with zero deck context, must understand wh
 
 > "The headline should ALWAYS express the key idea — the clearest articulation of it. Then the body proves or extrapolates it." — author's rule, 2026-05-29
 
-This is the `/strategy:narrative` **Headline-vs-Role** test, verbatim:
+This is the **Headline-vs-Role** test:
 
 > "Does the headline DO the job the role requires, or does it just describe the topic? **Headlines that describe topics are OBSERVATIONS. Headlines that do jobs are ARGUMENTS.**"
 
 And the agentic-slides **Unveiling-vs-Supporting** test: "Does this NAME a new idea as a claim, or describe an example/topic of one? If it's opaque or generic without the body, it's doing description work."
 
-- **The "stuff changed" smell:** A headline like "Today, new technologies are evolving the purpose, discovery and ongoing value of asset management" names a subject and asserts nothing a skeptic could disagree with. It is a LABEL. It does not earn its weight.
+- **The "stuff changed" smell:** A headline like "Today, new technologies are evolving the purpose, discovery and ongoing value of home fitness" names a subject and asserts nothing a skeptic could disagree with. It is a LABEL. It does not earn its weight.
 - **The claim test:** Could a skeptical client read the headline alone and either agree or disagree with a specific assertion? If there is nothing to disagree with, it is a label. Rewrite it into a claim.
 - **Compare:** a Bloomberg-style exemplar — "New technologies and the evolution of ABM are making differentiated features the common experience" — makes a claim. The topic version would have been "How ABM is evolving."
 
@@ -50,7 +50,7 @@ And the agentic-slides **Unveiling-vs-Supporting** test: "Does this NAME a new i
 
 Read the eyebrows + headlines in order, with NO body copy. They must tell the whole argument on their own, each one making the next feel inevitable — a run-on story, not a table of contents.
 
-- **Mechanism:** the Headline Transition Scoring + the `/strategy:narrative` **Argument-chain test**. Score every A→B transition 1–10 (does B follow from A — shared language, logical progression, emotional continuity). **Any transition below 6 = rewrite.**
+- **Mechanism:** the Headline Transition Scoring + the **Argument-chain test**. Score every A→B transition 1–10 (does B follow from A — shared language, logical progression, emotional continuity). **Any transition below 6 = rewrite.**
 - **Keyword threading:** the 2–3 words carrying the argument should reappear across adjacent slides. If slide N names "the relationship," slide N+1 should pick up "relationship" or its consequence. Shared nouns are the connective tissue.
 - **The aloud test:** read the headlines in sequence out loud. Any moment you think "wait, how did we get here?" is a broken transition.
 - **Blind-read:** a reader who sees ONLY the headlines must be able to reconstruct the deck's argument from problem to resolution. If the summary misses the core proposition, the headlines aren't carrying it.
@@ -59,7 +59,7 @@ Read the eyebrows + headlines in order, with NO body copy. They must tell the wh
 
 ## Rewrite rule (when a headline fails)
 
-When the gate flags a headline, fix it by **extracting, not summarizing.** This is the `/strategy:narrative` **Extract-Don't-Summarize** rule:
+When the gate flags a headline, fix it by **extracting, not summarizing.** This is the **Extract-Don't-Summarize** rule:
 
 > "If shortening: cut words from the original line. Don't rephrase. Replacing a specific, voiced sentence with a generic summary is a SKILL FAILURE."
 
@@ -67,7 +67,7 @@ The first move on a label-headline is to **hunt the author's existing copy** —
 
 **Watch the promotion side-effect:** if you promote a body line to the headline, that line must LEAVE the body (otherwise the body restates the headline). Re-check the body after any headline promotion.
 
-**Voice constraints on any rewrite:** no em dashes, no Big One (negation-correction "X isn't Y, it's Z"), Twin-B register. Run the result through the Copy Quality voice gate before applying.
+**Voice constraints on any rewrite:** no em dashes, no negation-correction constructions ("X isn't Y, it's Z"). Run the result through the Copy Quality voice gate before applying.
 
 **Surface, don't auto-apply:** the gate produces findings and sourced rewrite candidates. Present them for accept/reject; the author picks. (Standing rule: critique tools surface, never auto-edit.)
 
@@ -91,4 +91,4 @@ Reference implementation: a Section-1 headline evaluation run, 2026-05-29. To ge
 
 - [per-slide-clarity-gate.md](per-slide-clarity-gate.md) — owns the full per-slide cold-read + fidelity machinery (Naive + Expert + aggregator). Check 1 is its headline-scoped subset. The clarity gate still runs whole at Phase 5.2.
 - [headline-review-agents.md](headline-review-agents.md) — DEPRECATED; its Blind Reader / Gap Analyzer / Transition Scoring are absorbed here.
-- `/strategy:narrative` Headline-vs-Role + Argument-chain + Extract-Don't-Summarize — the strategic-authoring source of Checks 2 and 3. This gate is the render-stage enforcement of that discipline. Strategy owns "does the headline argue?"; this gate owns "does it still argue on the canvas, cold, in sequence?"
+- Headline-vs-Role + Argument-chain + Extract-Don't-Summarize are strategic-authoring disciplines; this gate is their render-stage enforcement. Authoring owns "does the headline argue?"; this gate owns "does it still argue on the canvas, cold, in sequence?"

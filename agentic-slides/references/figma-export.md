@@ -17,11 +17,11 @@ Two modes:
 The official Figma MCP server must be connected. This is available as a claude.ai integration — no local install required.
 
 **Required tools:**
-- `mcp__claude_ai_Figma__use_figma` — write to the canvas (Plugin API JavaScript)
-- `mcp__claude_ai_Figma__get_screenshot` — screenshot nodes for verification
-- `mcp__claude_ai_Figma__get_design_context` — read existing designs
-- `mcp__claude_ai_Figma__search_design_system` — find reusable components/variables
-- `mcp__claude_ai_Figma__get_metadata` — file structure and pages
+- `mcp__<your-figma-server>__use_figma` — write to the canvas (Plugin API JavaScript)
+- `mcp__<your-figma-server>__get_screenshot` — screenshot nodes for verification
+- `mcp__<your-figma-server>__get_design_context` — read existing designs
+- `mcp__<your-figma-server>__search_design_system` — find reusable components/variables
+- `mcp__<your-figma-server>__get_metadata` — file structure and pages
 
 **User provides:** A Figma file URL or file key. Extract the key from the URL: `figma.com/design/:fileKey/:fileName`.
 
@@ -85,7 +85,7 @@ Adapt the font list to the design system. Present results to the user. If critic
 Before building from scratch, check what's already available:
 
 ```
-mcp__claude_ai_Figma__search_design_system(fileKey, query: "button")
+mcp__<your-figma-server>__search_design_system(fileKey, query: "button")
 ```
 
 Import reusable components via `importComponentByKeyAsync` / `importComponentSetByKeyAsync` instead of recreating them.
@@ -131,7 +131,7 @@ For each Paper slide:
 After every 2-3 slides:
 
 ```
-mcp__claude_ai_Figma__get_screenshot(fileKey, nodeId)
+mcp__<your-figma-server>__get_screenshot(fileKey, nodeId)
 ```
 
 Compare visually against intent (or Paper original for exports). Fix mismatches before continuing.
@@ -273,7 +273,7 @@ footer.counterAxisAlignItems = "MAX";
 
 After all slides are written:
 
-1. Screenshot every Figma slide via `mcp__claude_ai_Figma__get_screenshot`
+1. Screenshot every Figma slide via `mcp__<your-figma-server>__get_screenshot`
 2. Screenshot every Paper slide via Paper MCP `get_screenshot`
 3. Compare side by side for: clipping, missing content, wrong positioning, color/font mismatches, spacing differences
 4. Fix via `use_figma` with `figma.getNodeByIdAsync()` to target specific nodes

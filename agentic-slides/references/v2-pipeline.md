@@ -2,8 +2,6 @@
 
 Canonical reference for the 5-link orchestrated pipeline that runs as Phase 5 of `/agentic-slides`. Replaces the standalone clarity gate as the LAST gate before a deck ships.
 
-Source design: `~/.claude/plans/i-need-you-to-shiny-kahan.md` §15–§25.
-Build plan: `~/.claude/plans/let-s-pick-this-up-functional-ember.md`.
 
 ---
 
@@ -38,9 +36,9 @@ Phase 5 (after Pass 1–4 quality):
 │  Detector: inferential-detector.py (regex) → agents/       │
 │  inferential-detector.md (named-entity novelty) as         │
 │  fallback.                                                 │
-│  On qualifying rewrites: spawn 2-pass strategy:pressure-   │
-│  test:pressure-test-critic (Pass 1 attack → Pass 2 attack  │
-│  the attack).                                              │
+│  On qualifying rewrites: spawn 2-pass adversarial critic   │
+│  via agents/pressure-test-critic.md (Pass 1 attack →       │
+│  Pass 2 attack the attack).                                │
 │  Outputs: rewrite-pressure-test.json                       │
 │  Halt: Pass 2 confirms a Pass 1 objection — orchestrator-  │
 │  enforced (see §halt-enforcement-class).                   │
@@ -177,7 +175,7 @@ git -C <project> diff --stat docs/research/deck-headlines-*.md
     {
       "id": "M001",
       "claim_type": "numeric_confabulation_in_rewrites",
-      "regex_signature": "(\\d+)[-–](\\d+)% of (REDACTED|advisors|institutional)",
+      "regex_signature": "(\\d+)[-–](\\d+)% of (customers|users|buyers)",
       "mechanism_description": "Expert agent introduces percentage range in rewrite to replace an 'every X' overclaim from the slide. The range is not in the dossier; it's a 'reasonable-sounding' fabrication.",
       "first_caught": {
         "project_anon": "client-deck-A",
@@ -234,5 +232,3 @@ If none fire, the pipeline auto-applies (or stages, until §auto-applier-promoti
 
 - `per-slide-clarity-gate.md` — canonical spec for link 1 (the gate v1.2)
 - `clarity-gate-spawn.md` — orchestrator playbook for link 1
-- `~/.claude/plans/i-need-you-to-shiny-kahan.md` §15–§25 — full v2 design rationale
-- `~/.claude/plans/let-s-pick-this-up-functional-ember.md` — this build's execution plan and review decisions

@@ -76,7 +76,7 @@ Common mistakes that make decks look amateur. Each one includes why it fails and
 
 ## Writing slide copy that sounds like AI
 **Why it fails:** False agency, passive voice, throat-clearing openers, and dramatic fragmentation are tells.
-**Instead:** Copy quality is enforced by `/write:voice` (the canonical voice review agent), which references `~/.claude/voice-dna.md` and `~/.claude/copy-polish.md`. See those files for anti-slop rules.
+**Instead:** Copy quality is enforced by the Pass 4 Copy Quality gate in [quality-system-v2.md](quality-system-v2.md). Its rubric carries the anti-slop rules.
 
 ## Cramming content
 **Why it fails:** Dense slides overwhelm. The audience reads ahead instead of listening.
@@ -110,9 +110,9 @@ Common mistakes that make decks look amateur. Each one includes why it fails and
 **Why it fails:** The eye needs a text-only rest between image-dense slides. Two mosaics in a row feel like a photo dump.
 **Instead:** Insert a text slide, quote, or section divider between image-heavy slides.
 
-## Side-stripe borders on cards (CRITICAL — inherits /design:impeccable absolute ban)
+## Side-stripe borders on cards (CRITICAL — absolute ban)
 **Why it fails:** A thick (3–8px) colored vertical bar hugging the left edge of a card/list-item/callout is the single most recognizable "AI slop" tell. It's an **absolute ban**, and a grid/alignment eval is blind to it (the stripe is on-palette, on-grid, not a collision). It shipped on two real slides while a deterministic eval reported "0 violations" because the eval only measured geometry.
-**Instead:** Re-treat the block — subtle surface fill (e.g. a near-white card tint) or a clean full outline, and express any brand color in the **name text**, never a stripe. Deck design evals must inherit the full `/design:impeccable` ban list (side-stripes, gradient text, underline/strike on slide copy), not rely on perceptual agents to catch them. Mechanical check: a 3–8px vertical rect with content immediately to its right and none to its left = a side-stripe → flag.
+**Instead:** Re-treat the block — subtle surface fill (e.g. a near-white card tint) or a clean full outline, and express any brand color in the **name text**, never a stripe. Deck design evals must enforce this ban list mechanically (side-stripes, gradient text, underline/strike on slide copy), not rely on perceptual agents to catch them. Mechanical check: a 3–8px vertical rect with content immediately to its right and none to its left = a side-stripe → flag.
 
 ## Headline size inconsistent across same-type slides
 **Why it fails:** A headline that's "fine on its own slide" (e.g. 30px) reads as broken next to twelve 60px siblings. Per-slide review can't see it; only a cross-frame comparison can. Compounded when the outlier is also a non-headline color (royal) or underlined — it reads as a broken hyperlink.

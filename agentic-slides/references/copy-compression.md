@@ -1,6 +1,6 @@
 # Copy Compression: Select, Don't Summarize
 
-> **Ownership (consolidation 2026-06-01):** This file is the **canonical owner of the slide word-cap table** (the values + the method to hit them). voice-scoring.md and `/write:edit` carry the numbers as marked mirrors — change a cap *here* first. · The **doctrine** behind "select, don't summarize" is owned upstream by `/strategy:narrative` → **"Extract, Don't Summarize"** (authoring) and `voice-dna.md` → **"The Extraction Principle"** (voice axiom); this file is the *render-stage application* with slide-level worked examples.
+> This file is the **canonical owner of the slide word-cap table** (the values + the method to hit them). The doctrine behind "select, don't summarize" applies at every stage; this file is the render-stage application with slide-level worked examples.
 
 The default AI failure mode when asked to shorten copy is to summarize everything in fewer words. This produces vague, flattened prose that sounds like a brief instead of a slide. The correct approach is **selection**: pick the one idea that earns its place, cut the rest.
 
@@ -31,7 +31,7 @@ Of all the evidence in the body (stats, examples, comparisons, analogies), which
 If sentence count says fine but word count says over: word count wins. Recompress.
 
 ### Step 4: Check against the headline
-Body must not restate the headline. See `strategy-engine/references/slide-conventions.md` → "Body copy extends, never restates" for the full rule and examples. Common violations to catch during compression:
+Body must not restate the headline. **Body copy extends, never restates** — the body adds the proof, mechanism, or consequence the headline can't carry. Common violations to catch during compression:
 - Body sentence 1 rephrases the headline in different words
 - Body final sentence re-lands the same point as a "kicker"
 
@@ -73,13 +73,13 @@ If the compressed version fails SCDS, you cut too little or you summarized inste
 
 ## When to invoke this reference
 
-- After any copy-polish pass flags SCDS failures
+- After any copy-quality pass flags SCDS failures
 - When body copy exceeds the word budget for its slide type
 - Before pushing copy to Figma (final gate)
 - When the user says "this is too long" or "distill this"
 
-## Relationship to /strategy-engine:distill
+## Compression vs. distillation
 
-/strategy-engine:distill is for **narrative documents** (briefs, specs) where you need the full story in fewer words. That's compression.
+Distillation is for **narrative documents** (briefs, specs) where you need the full story in fewer words. That's compression.
 
 This reference is for **slide copy** where you need one idea per slide. That's selection. Different problem, different tool. Don't use distill for slides. Use this method.

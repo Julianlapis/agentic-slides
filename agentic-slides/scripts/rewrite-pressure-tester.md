@@ -80,10 +80,10 @@ Capture the JSON output per slide. If `needs_pressure_test == true`, add the sli
 
 For each slide in the pressure-test set, dispatch TWO sequential agents:
 
-**Pass 1 — attack:**
+**Pass 1 — attack:** spawn a fresh general-purpose agent using the critic prompt in [../agents/pressure-test-critic.md](../agents/pressure-test-critic.md):
 
 ```
-subagent_type: strategy:pressure-test:pressure-test-critic
+subagent_type: general-purpose  # prepend agents/pressure-test-critic.md as the system framing
 description: Pass 1 attack on slide <SID> rewrite
 prompt: |
   Attack this rewrite. Find the strongest case that it overclaims, infers
@@ -99,10 +99,10 @@ prompt: |
   ]}
 ```
 
-**Pass 2 — attack the attack:**
+**Pass 2 — attack the attack:** fresh agent, same critic prompt:
 
 ```
-subagent_type: strategy:pressure-test:pressure-test-critic
+subagent_type: general-purpose  # prepend agents/pressure-test-critic.md as the system framing
 description: Pass 2 attack on Pass 1 objections, slide <SID>
 prompt: |
   Attack Pass 1's objections. For each, decide whether the objection survives
@@ -166,7 +166,7 @@ jq '.halt_reasons' $RUN_DIR/rewrite-pressure-test.json
 
 ## Reuse
 
-- `strategy:pressure-test:pressure-test-critic` agent — used as-is for both passes. Do NOT create a new critic agent for this pipeline.
+- `agents/pressure-test-critic.md` critic prompt — used as-is for both passes. Do NOT improvise a different critic for this pipeline.
 - `inferential-detector.py` regex layer — runs first; saves spawn cost on rewrites it already flagged.
 - `agents/inferential-detector.md` agent — runs only on rewrites the regex layer didn't flag.
 

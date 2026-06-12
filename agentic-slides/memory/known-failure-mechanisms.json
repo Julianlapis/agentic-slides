@@ -4,7 +4,7 @@
     {
       "id": "M001",
       "claim_type": "numeric_confabulation_in_rewrites",
-      "regex_signature": "(\\d+)[-\u2013](\\d+)% of (REDACTED|advisors|institutional|retail|REDACTED)",
+      "regex_signature": "(\\d+)[-\u2013](\\d+)% of (customers|users|buyers|respondents|adopters)",
       "mechanism_description": "Expert agent introduces a percentage range in a rewrite to replace an 'every X' or 'most X' overclaim from the slide. The specific range is not in the dossier; it's a 'reasonable-sounding' fabrication added during the rewrite step.",
       "first_caught": {
         "project_anon": "client-deck-A",

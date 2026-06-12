@@ -17,7 +17,7 @@ The four-pass quality system (`quality-system-v2.md`) operates at deck level. Pa
 
 This gate catches both. It is the LAST gate before ship. It is not optional.
 
-**Origin:** Built 2026-05-11 during a high-stakes agency pitch. The deck passed the four-pass system at Pass 3 60/60 ("FLAWLESS"). The per-slide gate caught two genuine fact-check failures (S13 unsupported attribution, S22 heritage conflation) and one BROKEN slide (S15 an unverified dollar figure + category error). Both fact-checks would have embarrassed the team in front of the client. A post-gate pressure-test additionally caught the gate's own Expert confabulating a number inside a recommended rewrite (S09 70-80% REDACTED stat) — this drove the v1.2 source-check patch.
+**Origin:** Built 2026-05-11 during a high-stakes agency pitch. The deck passed the four-pass system at Pass 3 60/60 ("FLAWLESS"). The per-slide gate caught two genuine fact-check failures (S13 unsupported attribution, S22 an attribution conflation) and one BROKEN slide (S15 an unverified dollar figure + category error). Both fact-checks would have embarrassed the team in front of the client. A post-gate pressure-test additionally caught the gate's own Expert confabulating a number inside a recommended rewrite (S09 an invented 70-80% stat) — this drove the v1.2 source-check patch.
 
 ---
 
@@ -177,7 +177,7 @@ Mismatches flag the slide as un-judged.
 
 ### 8. Source-check on recommended_rewrite (v1.2+, NEW)
 
-The pressure-test of one gate run caught the gate's own Expert agent confabulating a "70-80% of REDACTED" stat inside a recommended rewrite (S09). The stat wasn't in the dossier — the Expert produced it from its own reasoning and presented it as research-grounded.
+The pressure-test of one gate run caught the gate's own Expert agent confabulating a "70-80%" stat inside a recommended rewrite (S09). The stat wasn't in the dossier — the Expert produced it from its own reasoning and presented it as research-grounded.
 
 v1.2 adds: any numeric claim or specific entity name in a `recommended_rewrite` must trace to either the dossier excerpt the Expert received, or be explicitly flagged as "INFERENTIAL — needs verification" in the cite. The aggregator runs a pattern scan for unflagged precision (percentages, dollar figures, specific dates, named entities) that doesn't appear in the slide content or the dossier excerpt.
 

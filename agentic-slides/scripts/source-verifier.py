@@ -153,7 +153,7 @@ def verify_numeric_in_dossier(claim: dict, dossier_norm_lower: str) -> dict:
 
 # Slide block extraction — mirrors auto-applier.py:slide_id_to_marker_candidates verbatim.
 # If you change this function, change the twin in auto-applier.py at the same time.
-# Intentional duplication per plan §C (let-s-pick-this-up-functional-ember.md): two CLI tools, ~15 lines, simplicity > premature extraction.
+# Intentional duplication: two CLI tools, ~15 lines, simplicity > premature extraction.
 # Trigger to extract into deck_utils.py: when a third script needs the same logic.
 def slide_id_to_marker_candidates(slide_id: str) -> list[str]:
     """Manifest 'S10C' may appear as 'Slide 10C' or 'Slide 10b' in deck. Try both."""

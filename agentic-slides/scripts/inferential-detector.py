@@ -3,7 +3,7 @@
 Inferential-detector — regex layer.
 
 Hybrid implementation per build plan Phase F step 13. This script handles the
-TWO regex-tractable markers from i-need-you-to-shiny-kahan.md §17:
+TWO regex-tractable confabulation markers:
 
   1. Causal language: words that assert a mechanism not stated in the original
      slide. Examples: 'because', 'drives', 'explains'.

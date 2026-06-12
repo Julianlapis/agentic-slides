@@ -17,7 +17,7 @@ v1.2 additions:
   dollar figures, specific dates) from every recommended rewrite and surfaces
   them in aggregate.json for verification. Driven by a prior pitch-run finding that
   gate Expert agents can confabulate precision inside rewrites (S09 70-80%
-  REDACTED stat caught by pressure-test).
+  invented stat caught by pressure-test).
 
 Usage:  python3 clarity-gate-aggregator.py <run_dir>
 """
@@ -92,11 +92,11 @@ def validate_expert(obj: dict, path: Path) -> list[str]:
 PRECISION_PATTERNS = [
     # Percentages: "80%", "70-80%", "+2 YoY"
     (re.compile(r"(?<!\w)(\d+(?:[.\-–]\d+)?%)"), "percentage"),
-    # Dollar amounts: "$686B", "$1.66T", "$124 trillion", "$46T"
+    # Dollar amounts: "$12B", "$1.5T", "$90 trillion", "$40T"
     (re.compile(r"\$\d+(?:[.,]\d+)?\s*(?:trillion|billion|million|[KMBT])(?!\w)", re.I), "dollar_amount"),
-    # Basis points: "263 bps", "37.4 bps"
+    # Basis points: "120 bps", "37.5 bps"
     (re.compile(r"\d+(?:\.\d+)?\s*(?:bps|basis points)", re.I), "basis_points"),
-    # Specific dates: "February 25, 2026", "November 28, 2025", "January 2025"
+    # Specific dates: "March 3, 2025", "October 14, 2024", "January 2025"
     (re.compile(r"(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}(?:,?\s+\d{4})?", re.I), "specific_date"),
     # Year-over-year specifics: "FY2025", "Q1 FY2026", "Q4 2024"
     (re.compile(r"\b(?:FY|Q[1-4]\s*(?:FY)?)\d{2,4}\b"), "fiscal_period"),
