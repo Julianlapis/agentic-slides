@@ -1,11 +1,11 @@
 ---
 name: agentic-slides
-description: Build production-quality presentation decks in Paper (default) or Figma from any source material. Use when the user wants to create slides, a deck, or a presentation. Handles content distillation, visual design, layout variety, copy quality, and export. Trigger when the user mentions "deck," "slides," "presentation," "pitch deck," or "conference talk." Also trigger when the user pastes or references ANY content (outline, doc, article, transcript, notes, URL) and wants it turned into something visual. Even if they don't say "slides" explicitly, if they have content that could become a multi-slide deck, use this skill. Paper is the default canvas. If the user says "in Figma" or provides a Figma URL, use the Figma canvas path instead.
+description: Build production-quality presentation decks in Figma (default) or Paper from any source material. Use when the user wants to create slides, a deck, or a presentation. Handles content distillation, visual design, layout variety, copy quality, and export. Trigger when the user mentions "deck," "slides," "presentation," "pitch deck," or "conference talk." Also trigger when the user pastes or references ANY content (outline, doc, article, transcript, notes, URL) and wants it turned into something visual. Even if they don't say "slides" explicitly, if they have content that could become a multi-slide deck, use this skill. Figma is the default canvas. If the user says "in Paper" or explicitly requests Paper, use the Paper canvas path instead.
 ---
 
 # Agentic Slides
 
-A layout intelligence engine. Takes content + design system, produces beautiful decks on Paper (default) or Figma.
+A layout intelligence engine. Takes content + design system, produces beautiful decks on Figma (default) or Paper.
 
 ## FIRST: Read Feedback Log
 
@@ -30,15 +30,15 @@ If any answer is no, you are about to skip the gates. Go back to Phase 1.
 
 ## Canvas Selection
 
-This skill builds on two canvases. Paper is the default.
+This skill builds on two canvases. Figma is the default.
 
-**Paper (default):** Uses Paper MCP tools (`write_html`, `get_screenshot`, `update_styles`, etc.). Builds incrementally with HTML. Exports to PDF via screenshot pipeline. Best for rapid iteration and solo workflows.
+**Paper:** Uses Paper MCP tools (`write_html`, `get_screenshot`, `update_styles`, etc.). Builds incrementally with HTML. Exports to PDF via screenshot pipeline. Best for rapid iteration and solo workflows.
 
-**Figma:** Uses the official Figma MCP `use_figma` tool to write directly to the Figma canvas via the Plugin API. Builds with real Figma frames, auto-layout, components, and variables. The output is a native Figma file your team can edit, comment on, and hand off. Best for team workflows and design system integration.
+**Figma (default):** Uses the official Figma MCP `use_figma` tool to write directly to the Figma canvas via the Plugin API. Builds with real Figma frames, auto-layout, components, and variables. The output is a native Figma file your team can edit, comment on, and hand off. Best for team workflows and design system integration.
 
 **How to select:**
-- Default: Paper. No need to specify.
-- If the user says "in Figma", provides a Figma file URL, or asks to build using their Figma design system → use Figma.
+- Default: Figma. No need to specify.
+- If the user says "in Paper" or explicitly requests Paper → use Paper.
 - If the user says "export to Figma" after building in Paper → use the Figma export pipeline (see Phase 6).
 
 **Figma requirements:** The Figma MCP server must be connected (available as a claude.ai integration). The user needs to provide a Figma file key or URL for the target file.
@@ -109,13 +109,13 @@ Design systems are additive. The user can feed in more reference decks over time
 
 ## Before You Start
 
-### Paper (default)
+### Paper
 1. **`get_basic_info`** — File structure, artboards, loaded fonts.
 2. **`get_font_family_info`** — Verify font availability and weights. Do this before writing any styles.
 3. **`get_selection`** — Check what the user is focused on.
 4. **Confirm both inputs.** Content file exists? Design system identified? If not, create them.
 
-### Figma
+### Figma (default)
 1. **Get the file key.** Extract from the Figma URL (`figma.com/design/:fileKey/...`) or ask the user.
 2. **`mcp__<your-figma-server>__get_metadata`** — Understand file structure, pages, existing components.
 3. **`mcp__<your-figma-server>__search_design_system`** — Check for existing design system components, variables, and styles to reuse.
@@ -320,7 +320,7 @@ Check font availability with `get_font_family_info` before committing.
 
 ## Phase 4: Build
 
-### Paper Path (default)
+### Paper Path
 
 #### Artboard Setup
 - Default: 1440 x 810px (16:9)
@@ -344,7 +344,7 @@ Every slide: content frame (flex-grow: 1, pushes footer to bottom) + footer (per
 #### Efficiency
 After building 2-3 unique slides, clone similar layouts with `duplicate_nodes` and modify with `update_styles` / `set_text_content`.
 
-### Figma Path
+### Figma Path (default)
 
 #### Frame Setup
 - Default: 1456 x 816px (16:9, Figma presentation standard)
@@ -492,7 +492,7 @@ The user may request these specialized review passes:
 ## Session Flow
 
 1. User provides content (or topic to research)
-2. **Determine canvas** — Paper (default) or Figma (if user specifies or provides Figma URL)
+2. **Determine canvas** — Figma (default) or Paper (if user explicitly requests Paper)
 3. **Create content markdown file** — distill, structure, save
 4. **Identify design system** — user-provided, or confirm default. For Figma: search for existing design system components first.
 5. **Layout planning** — assign layouts to all slides, present full plan

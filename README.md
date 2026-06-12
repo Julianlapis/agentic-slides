@@ -19,13 +19,13 @@ The combo: **teach it a design language, then build decks in it.**
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (CLI or desktop app)
 
-**For building decks in Paper (default canvas):**
-- [Paper](https://paper.design) desktop app with MCP enabled
-- Python 3 with Pillow (`pip install Pillow`) for PDF export
-
-**For building decks in Figma:**
+**For building decks in Figma (default canvas):**
 - [Figma MCP server](https://www.figma.com/developers/mcp) configured in Claude Code
 - The skill refers to Figma tools as `mcp__<your-figma-server>__use_figma` etc. — the prefix depends on what you named the server; Claude resolves it
+
+**For building decks in Paper:**
+- [Paper](https://paper.design) desktop app with MCP enabled
+- Python 3 with Pillow (`pip install Pillow`) for PDF export
 
 **For ingesting PPTX files (optional):**
 - `pip install markitdown python-pptx`
@@ -70,10 +70,10 @@ Use the design system at ./my-design-system.md
 
 No design system? It falls back to a clean monochromatic default that works for any deck.
 
-Build in Figma instead of Paper:
+Build in Paper instead of Figma:
 
 ```
-/agentic-slides Build this deck in Figma: [content]
+/agentic-slides Build this deck in Paper: [content]
 ```
 
 ### 3. Export
