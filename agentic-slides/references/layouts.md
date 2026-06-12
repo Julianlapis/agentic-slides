@@ -382,9 +382,9 @@ Closing slide. Bookends the deck with the title slide.
 
 ---
 
-## Strategy Framework Layouts (from TMS Strategy)
+## Strategy Framework Layouts
 
-These patterns come from the TMS Strategy template system. They're built for strategy decks: roadmaps, frameworks, journeys, projections. Each one encodes a specific strategic argument in its spatial structure.
+These patterns are built for strategy decks: roadmaps, frameworks, journeys, projections. Each one encodes a specific strategic argument in its spatial structure.
 
 ---
 
@@ -521,6 +521,28 @@ Staggered workstream blocks that build on each other over time.
 - Blocks use gradient fills, darker for the named workstream, lighter for extensions
 
 **Key design rule:** This communicates "building on each other." Each new workstream starts where the previous one has established a foundation.
+
+**Gantt/timeline spacing rules:**
+1. Activity pills must align horizontally to the timeline. Use absolute positioning: `startX = phaseStartWeek * (totalWidth / totalWeeks)`.
+2. Use stacked rows, not cascading waterfalls. Each phase gets its own full-width band container.
+3. 28px minimum spacing between phase bands (`itemSpacing: 28`). Each band needs internal padding below pills (~8-10px). If phases feel crammed, double the spacing.
+
+---
+
+## Surface Variety as Layout Intelligence
+During layout planning, explicitly map surface colors alongside layouts. Surface variety is a layout decision, not a design system change — the design system defines what's available, the layout plan decides what gets used.
+
+Check: does the deck use all defined surface types? Are there more than 4 consecutive slides on the same surface? Is there a surface change at every narrative section break?
+
+Add surface mapping to the layout plan output:
+```
+01 — Dark: Title
+02 — Cream: Content
+03 — Cream: Content
+04 — Red: Statement (section break)
+```
+
+If the plan shows 5+ consecutive same-surface slides, flag it before building.
 
 ---
 

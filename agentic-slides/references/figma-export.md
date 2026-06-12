@@ -242,6 +242,10 @@ function sf(node, hex) {
 **Problem:** Side-by-side panels with different vertical alignment look misaligned.
 **Fix:** Set both panels to `primaryAxisAlignItems = "CENTER"` and `layoutSizingVertical = "FILL"`.
 
+### 8. Text nodes default to 0px width in auto-layout
+**Problem:** After creating a text node in a Figma auto-layout frame, FILL sizing on text nodes inside auto-layout can silently default to 0px, causing text to render character-per-line (vertical).
+**Fix:** ALWAYS call `node.resize(parentWidth, node.height)` BEFORE setting `textAutoResize = "HEIGHT"`. The resize forces an explicit width, then HEIGHT mode lets it reflow vertically. Without the explicit resize, text collapses to 0px width.
+
 ---
 
 ## Footer Pattern (Absolute Positioned)

@@ -1,6 +1,6 @@
 ---
-name: paper-slides
-description: Build production-quality presentation decks in Paper (default) or Figma from any source material. Use when the user wants to create slides, a deck, or a presentation. Handles content distillation, visual design, layout variety, copy quality, and export. Trigger when the user mentions "deck," "slides," "presentation," "pitch deck," or "conference talk." Also trigger when the user pastes or references ANY content (outline, doc, article, transcript, notes, URL) and wants it turned into something visual. Even if they don't say "slides" explicitly, if they have content that could become a multi-slide deck, use this skill. Paper is the default canvas. If the user says "in Figma" or provides a Figma file URL, use the Figma canvas path instead.
+name: agentic-slides
+description: Build production-quality presentation decks in Figma (default) or Paper from any source material. Use when the user wants to create slides, a deck, or a presentation. Handles content distillation, visual design, layout variety, copy quality, and export. Trigger when the user mentions "deck," "slides," "presentation," "pitch deck," or "conference talk." Also trigger when the user pastes or references ANY content (outline, doc, article, transcript, notes, URL) and wants it turned into something visual. Even if they don't say "slides" explicitly, if they have content that could become a multi-slide deck, use this skill. Figma is the default canvas. If the user says "in Paper" or explicitly requests Paper, use the Paper canvas path instead.
 ---
 
 # Agentic Slides
@@ -53,7 +53,7 @@ A design brain that can lay out any kind of deck: strategy, portfolio, capabilit
 2. **Layout Is the Skill.** Choosing which layout pattern fits which content, then sequencing them for narrative rhythm across the full deck. This is the hard part. This is what the skill does.
 3. **Restraint Over Decoration.** Fewer elements, highly refined. White space is a feature.
 4. **Incremental Building.** Each `write_html` call produces ONE visual group. The user sees progress every few seconds.
-5. **Quality Is Mandatory.** The four-pass quality system runs after every round of changes. See [references/quality-system.md](references/quality-system.md).
+5. **Quality Is Mandatory.** The four-pass quality system runs after every round of changes. See [references/quality-system-v2.md](references/quality-system-v2.md).
 
 ---
 
@@ -72,6 +72,7 @@ A markdown file containing all deck content, structured by slide. This file is t
 # [Deck Title]
 
 ## Slide 1: [Slide Name]
+- **Role:** [1-2 sentences: what this slide does in the argument, what the audience should think/feel after, what it does NOT do. E.g. "Diagnose the opportunity gap from two angles. Does NOT name the solution."]
 - **Type:** [title | section-divider | content | quote | image-gallery | etc.]
 - **Eyebrow:** [optional label]
 - **Headline:** [main text]
@@ -85,6 +86,8 @@ A markdown file containing all deck content, structured by slide. This file is t
 ```
 
 Reference this file throughout the build. When context gets long, re-read it rather than relying on memory.
+
+**Handoff contract with strategy-engine:** If the content file was produced by `/strategy:narrative`, it arrives finalized: voiced, role-audited, anti-blandification checked. Agentic-slides compresses for visual constraints (word budgets per layout type) and validates narrative comprehension in rendered form. It does not rewrite for strategic quality. If a headline doesn't argue or a body restates the headline, flag it back to the user rather than rewriting. Strategy-engine owns "does the argument work?" Agentic-slides owns "does the argument survive the canvas?"
 
 ### 2. Design System (REQUIRED, with default fallback)
 
@@ -121,13 +124,54 @@ Design systems are additive. The user can feed in more reference decks over time
 
 ---
 
+## Step 0: Detect Existing State
+
+Before starting the phase sequence, check what already exists.
+
+**Check for existing deck state:**
+- Paper: `get_basic_info` (are there artboards already?)
+- Figma: `mcp__claude_ai_Figma__get_metadata` (are there slide frames in the target file?)
+
+**Check for content file:**
+```bash
+ls *-slides.md *-content.md *-deck.md 2>/dev/null
+```
+
+**Check for design system:**
+```bash
+ls *-design-system.md *-brand.md docs/brand-system.md 2>/dev/null
+```
+
+**Route based on findings:**
+
+**If artboards/frames exist AND content file exists:**
+
+```
+AskUserQuestion:
+  question: "Found [N] slides from a previous session. What do you want to do?"
+  header: "Existing Deck"
+  options:
+    - label: "Pick up where I left off"
+      description: "Review current state, continue building from slide [N]"
+    - label: "Rebuild from updated content"
+      description: "Keep the design system but re-extract content from a new or updated source"
+    - label: "Start fresh"
+      description: "New deck, new content, new design"
+```
+
+If "Pick up where I left off": screenshot the last few slides, confirm state with user, skip to Phase 4 (Build) at the right slide index.
+If "Rebuild from updated content": keep design system, proceed to Phase 1 with the new source.
+If "Start fresh": proceed to Phase 1 as normal.
+
+**If content file exists but no artboards:** Skip Phase 1 (content already structured), proceed to Phase 2 (Layout Planning).
+
+**If nothing exists:** Proceed to Phase 1.
+
+---
+
 ## Phase 1: Content Structuring
 
 Take whatever the user provides and produce the content markdown file.
-
-### Required Reading Before Writing Any Slide Copy
-
-Load [references/copy-patterns.md](paper-slides/references/copy-patterns.md) before extracting slide copy. It contains 9 patterns from Julian's actual decks showing what good slide copy looks like, plus the anti-patterns that AI consistently produces. Calibrate against these examples.
 
 ### The Core Rule: Extract, Don't Summarize
 
@@ -170,6 +214,22 @@ Does this breakdown capture the argument? Any sections that need more or fewer s
 ```
 
 Wait for approval. The user may want to reassign lines, add slides for underserved sections, or flag lines that must appear verbatim.
+
+### Roles Before Copy (MANDATORY)
+
+Write all slide roles BEFORE writing any copy. Roles are the narrative skeleton. They should read as a coherent argument on their own: "Frame the problem > Establish the category > Show the gap > Introduce the audience > Name the pain > Reframe > Propose > Defend > Prove > Close."
+
+**Role quality check:** "This slide shows the audience" is a summary, not a role. "Zoom in on who this person is. Make the room see him. Vivid, behavioral, specific." is a role. The role tells you HOW the slide should land, not just WHAT it contains.
+
+**Roles include constraints.** Every role should state what the slide deliberately avoids. "Diagnose the opportunity gap" is the intent. "Does NOT name the solution" is the constraint. Both matter. The solution enters the narrative at the proposition slide. Everything before it is earning the right to propose.
+
+When rewriting any slide, read the Role field first. If the rewrite violates the role, the rewrite is wrong regardless of how good the copy is.
+
+### Body Copy Sentence Limits (MANDATORY)
+
+Statement slides: 1-2 sentences max. Argument slides: 2 sentences max. Concept/POC slides: 3 sentences max. The presenter narrates supporting detail. The slide lands one thing.
+
+Before pushing copy to Paper or Figma, audit every slide's body against these limits. See [references/copy-compression.md](references/copy-compression.md) for the selection method.
 
 ### Anti-Blandification Check (run after extraction, before building)
 
@@ -316,8 +376,16 @@ See [references/figma-export.md](references/figma-export.md) for the complete CS
 
 ### Both Paths
 
-#### Re-read the Content File
-After every 5-6 slides, re-read the content markdown file to verify you haven't drifted from the source content. Context windows compress. The file doesn't.
+#### Content Drift Guard (MANDATORY, HARD GATE)
+
+After every 5 slides built, STOP and run this check:
+
+1. **Re-read the content markdown file** from disk (not from memory).
+2. **For each of the last 5 slides**, compare the headline and body text on the artboard/frame against the corresponding lines in the content file.
+3. **Verbatim match required.** If a slide's text was rewritten rather than lifted from the content file, that is drift. If words were added that don't appear in the source, that is drift. Cutting words from a source line is acceptable. Rephrasing is not.
+4. **If drift is found:** flag the slide number, show the artboard text vs. the source text, fix it before building the next batch.
+
+This gate exists because of the 2026-03-24 incident where 1,582 words of voiced copy were blandified in a single pass. Context windows compress over long builds. The content file does not. The file wins.
 
 For typography rules and troubleshooting, see [references/typography.md](references/typography.md).
 For common mistakes to avoid, see [references/anti-patterns.md](references/anti-patterns.md).
@@ -326,12 +394,19 @@ For common mistakes to avoid, see [references/anti-patterns.md](references/anti-
 
 ## Phase 5: Quality System (MANDATORY)
 
-After every round of content changes, run the four-pass quality system BEFORE telling the user the work is done.
+Phase 5 runs in **two parts**: the four-pass quality system (Phase 5.1, layout/design/narrative/copy) followed by the autonomous v2 pipeline (Phase 5.2, per-slide clarity gate + source verification + conditional pressure-test + auto-applier + failure-pattern logger).
+
+### Phase 5.1 — Four-pass quality system
+
+After every round of content changes, run the four-pass quality system BEFORE moving to Phase 5.2.
 
 1. **Layout Intelligence Agent** — Reviews the full slide sequence. Checks: layout variety, rhythm, content-to-layout fit, density pacing, section transitions. Suggests layout swaps where the current choice doesn't serve the content.
 2. **Design Quality Agent** — Screenshots every slide, scores on Hierarchy/Balance/Typography/Alignment/Contrast. Below 35/50 per slide: fix.
 3. **Narrative Flow Agent** — Reads all copy (re-read the content file), scores on Single-mindedness/Redundancy/Logical arc/Earned payoff/Specificity. Below 35/50: restructure.
 4. **Copy Quality (Stop Slop) Pass** — Runs quick checks on every line for false agency, passive voice, adverbs, throat-clearing, vague declaratives, dramatic fragmentation. Below 35/50: revise.
+
+**Copy Quality Gate (Fresh Context):**
+For the copy quality pass, spawn a voice-review subagent with a clean context rather than running checks in the main conversation. The subagent receives the Copy Quality rules from [references/quality-system.md](references/quality-system.md) plus only the copy to review, and returns line-by-line violations with rewrites. (If you maintain your own voice/style guide files, point the subagent at those too.) The agent catches every violation in a single pass: mechanical (banned phrases, em dashes, adverbs, false agency, passive voice) plus judgment calls (rhythm, register, voice authenticity, narrative density). This prevents context-window decay from degrading copy quality checks in long sessions.
 
 Launch all four as parallel background agents. Synthesize reports. Apply fixes in one batch. Screenshot to verify.
 
@@ -339,7 +414,33 @@ Launch all four as parallel background agents. Synthesize reports. Apply fixes i
 - Paper: `get_screenshot` from Paper MCP
 - Figma: `mcp__claude_ai_Figma__get_screenshot` with the file key and node ID
 
-Full scoring rubrics, agent prompt templates, and the complete stop-slop checklist are in [references/quality-system.md](references/quality-system.md).
+Full scoring rubrics, agent prompt templates, and the complete stop-slop checklist are in [references/quality-system-v2.md](references/quality-system-v2.md).
+
+### Phase 5.2 — v2 autonomous pipeline (LAST GATE before ship)
+
+After Phase 5.1 lands, run the five-link autonomous pipeline. The deck does NOT ship until this pipeline completes without halting. Canonical reference: [references/v2-pipeline.md](references/v2-pipeline.md).
+
+```
+gate (clarity v1.2)  →  source-verifier  →  pressure-tester (conditional)  →  auto-applier (stage-only)  →  failure-pattern-logger
+```
+
+**1. Per-slide clarity gate.** Spawn 2 agents per slide (Naive + Expert) per [references/per-slide-clarity-gate.md](references/per-slide-clarity-gate.md). Run `scripts/clarity-gate-aggregator.py <run_dir>` to produce `aggregate.json`. Halt on `Naive≤1 OR Expert=0`.
+
+**2. Source-verifier.** `python3 scripts/source-verifier.py <run_dir>`. Parallel WebFetch on URL'd citations (`ThreadPoolExecutor`, max_workers=10). Verbatim dossier match on named-author quotes. Numeric precision check against dossier. Loads `memory/known-failure-mechanisms.json` (skill-level scope only — project-level patterns flow to Expert prompt, not here. See v2-pipeline.md §source-verifier-scope). Halt on confirmed quote mismatch OR URL 404.
+
+**3. Rewrite pressure-tester (conditional).** Follow [scripts/rewrite-pressure-tester.md](scripts/rewrite-pressure-tester.md). Run `scripts/inferential-detector.py --aggregate <run_dir>/aggregate.json` (regex layer: causal verbs + standing assertions). For rewrites the regex did NOT flag, dispatch the `agents/inferential-detector.md` agent (named-entity novelty check). Qualifying rewrites get a 2-pass `strategy:pressure-test:pressure-test-critic`. Halt is **orchestrator-enforced** when Pass 2 confirms Pass 1 (v2-pipeline.md §halt-enforcement-class).
+
+**4. Auto-applier (stage-only at v2 launch).** `python3 scripts/auto-applier.py <run_dir>`. Pre-flight asserts `sha256(deck) == manifest.deck_snapshot_sha256` — halt on drift. Writes `pending-apply.diff` to the run dir; does NOT modify the canonical deck until `LIVE_APPLY = True` is flipped. Promotion checklist in v2-pipeline.md §auto-applier-promotion.
+
+**5. Failure-pattern-logger.** `python3 scripts/failure-pattern-logger.py <run_dir>`. Writes new candidates to project-level `<project>/.clarity-gate/known-failure-patterns.json` automatically. Skill-level promotion (typed regex_signature) is a human review step — surface candidates for approval.
+
+**Re-run policy:** halts require a full re-run from scratch. No checkpoint-resume (v2-pipeline.md §re-run-policy).
+
+Audit commands and halt thresholds: [references/v2-pipeline.md](references/v2-pipeline.md).
+
+### Phase 5b: Agent Cleanup
+
+After all quality agents complete, verify no orphaned subagent processes are still running before moving on.
 
 ---
 

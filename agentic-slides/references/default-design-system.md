@@ -1,6 +1,6 @@
 # Default Design System
 
-The fallback when no design system is provided. Minimal, monochromatic, works for any deck type. Derived from the TMS Core 2.0 template system.
+The fallback when no design system is provided. Minimal, monochromatic, works for any deck type.
 
 ---
 

@@ -10,6 +10,14 @@ Common mistakes that make decks look amateur. Each one includes why it fails and
 **Why it fails:** When you batch 3-5 create_artboard calls in parallel, Paper scatters them across the canvas. You can't fix positions until all calls return, and by then the user has seen the mess.
 **Instead:** Create ONE artboard at a time. Immediately fix its position. Then create the next. Sequential, never parallel.
 
+## CRITICAL: Not verifying artboard positions after creation
+**Why it fails:** `update_styles` can silently fail, especially after 8-10 artboards when the canvas gets crowded. Paper's auto-placement fights harder as more artboards exist. Slides appear in wrong positions without any error.
+**Instead:** After EVERY 5 artboards, run `get_basic_info` and verify ALL positions. Fix any drift BEFORE creating the next artboard. After ALL artboards exist, run a final `get_basic_info` position audit. Don't trust that `update_styles` worked — verify.
+
+## CRITICAL: Paper MCP targets whichever file is focused
+**Why it fails:** If the user clicks another tab, all subsequent MCP calls silently target the wrong canvas. Content vanishes. Positions appear to "drift" because they're set on a different artboard in a different project.
+**Instead:** Before every batch of writes, verify `fileName` in `get_basic_info` matches the target project. If it doesn't, STOP and tell the user to switch back.
+
 ## Building all slides before screenshotting
 **Why it fails:** Errors compound. A wrong font size on slide 1 gets duplicated to slides 2-10.
 **Instead:** Screenshot every 2-3 slides. Catch issues early.
@@ -46,6 +54,10 @@ Common mistakes that make decks look amateur. Each one includes why it fails and
 **Why it fails:** Each deck loses its identity.
 **Instead:** Each deck gets its own typographic personality. Verify with `get_font_family_info`.
 
+## Using update_styles for artboard height
+**Why it fails:** Paper ignores `update_styles` for height on artboards. The value is stored but has no visual effect. Content overflows or the artboard stays at default height.
+**Instead:** Use `write_html` with explicit height values. Always verify with `get_computed_styles` and screenshot after setting dimensions.
+
 ## Using overlay divs to darken backgrounds
 **Why it fails:** Paper renders children in order. Overlays added after content cover the content. z-index is unreliable.
 **Instead:** Use background gradients on the artboard itself, or add bg elements FIRST before content.
@@ -63,8 +75,8 @@ Common mistakes that make decks look amateur. Each one includes why it fails and
 **Instead:** Each slide introduces one new idea. Run the Narrative Flow scoring pass to catch redundancy.
 
 ## Writing slide copy that sounds like AI
-**Why it fails:** False agency ("the decision emerges"), passive voice, throat-clearing openers, and dramatic fragmentation are tells.
-**Instead:** Run the Copy Quality (Stop Slop) pass on every line. See `references/quality-system.md`.
+**Why it fails:** False agency, passive voice, throat-clearing openers, and dramatic fragmentation are tells.
+**Instead:** Copy quality is enforced by `/write:voice` (the canonical voice review agent), which references `~/.claude/voice-dna.md` and `~/.claude/copy-polish.md`. See those files for anti-slop rules.
 
 ## Cramming content
 **Why it fails:** Dense slides overwhelm. The audience reads ahead instead of listening.
@@ -72,20 +84,36 @@ Common mistakes that make decks look amateur. Each one includes why it fails and
 
 ## Mixing design systems in one deck
 **Why it fails:** A serif headline on one slide and a grotesque-only system on the next creates visual whiplash. The audience loses trust.
-**Instead:** Pick one system (C&T Strategy or TMS Core) and commit. Both live in `references/design-system-*.md`.
+**Instead:** Pick one system and commit. Your design system file is the single source of truth.
 
-## Rounded corners on images in a TMS Core deck
-**Why it fails:** TMS Core uses sharp rectangles exclusively. Rounded corners break the mosaic grid and look like a different template.
+## Rounded corners on images in a sharp-rectangle system
+**Why it fails:** If the design system uses sharp rectangles exclusively, rounded corners break the grid and look like a different template.
 **Instead:** All images: sharp corners, object-fit cover, no borders, no shadows.
 
 ## Using bold weight in a monofont system
-**Why it fails:** TMS Core achieves hierarchy through size contrast, not weight. Adding bold creates a different visual language.
+**Why it fails:** Size-contrast systems achieve hierarchy through size, not weight. Adding bold creates a different visual language.
 **Instead:** Keep everything at regular weight (400). Scale up headlines instead of bolding them.
 
+## Using paddingBlock/paddingInline on artboards
+**Why it fails:** Paper's `create_artboard` and `update_styles` ignore `paddingBlock` and `paddingInline` longhand logical properties. The values are stored but have no visual effect. Content renders edge-to-edge.
+**Instead:** Use the shorthand `padding: "60px"`. Always verify with `get_computed_styles` after setting padding, and screenshot to confirm visually.
+
+## Using frame opacity instead of fill opacity for backgrounds
+**Why it fails:** `node.opacity = 0.08` makes ALL children transparent, including text. A card with frame-level opacity renders as a dark gray box with invisible text.
+**Instead:** Use fill-level opacity: `node.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 }, opacity: 0.08 }]`. This makes the background transparent while keeping text and other children at full opacity.
+
 ## Inconsistent image grid gaps
-**Why it fails:** TMS Core grids use 4-6px gaps. Mixing 4px and 20px gaps within the same slide breaks the mosaic feel.
+**Why it fails:** Mosaic-grid systems use tight (4-6px) gaps. Mixing 4px and 20px gaps within the same slide breaks the mosaic feel.
 **Instead:** Set one gap value per deck and stick with it.
 
 ## Putting two image-grid slides back-to-back
 **Why it fails:** The eye needs a text-only rest between image-dense slides. Two mosaics in a row feel like a photo dump.
 **Instead:** Insert a text slide, quote, or section divider between image-heavy slides.
+
+## Side-stripe borders on cards (CRITICAL — inherits /design:impeccable absolute ban)
+**Why it fails:** A thick (3–8px) colored vertical bar hugging the left edge of a card/list-item/callout is the single most recognizable "AI slop" tell. It's an **absolute ban**, and a grid/alignment eval is blind to it (the stripe is on-palette, on-grid, not a collision). It shipped on two real slides while a deterministic eval reported "0 violations" because the eval only measured geometry.
+**Instead:** Re-treat the block — subtle surface fill (e.g. a near-white card tint) or a clean full outline, and express any brand color in the **name text**, never a stripe. Deck design evals must inherit the full `/design:impeccable` ban list (side-stripes, gradient text, underline/strike on slide copy), not rely on perceptual agents to catch them. Mechanical check: a 3–8px vertical rect with content immediately to its right and none to its left = a side-stripe → flag.
+
+## Headline size inconsistent across same-type slides
+**Why it fails:** A headline that's "fine on its own slide" (e.g. 30px) reads as broken next to twelve 60px siblings. Per-slide review can't see it; only a cross-frame comparison can. Compounded when the outlier is also a non-headline color (royal) or underlined — it reads as a broken hyperlink.
+**Instead:** All same-type slide headlines share one size tier. Run a deck-level check: flag any headline under ~70% of the median headline size. Headlines are black ink by default; reserve accent color for semantic emphasis, never a full headline by accident. No `textDecoration` on slide copy.

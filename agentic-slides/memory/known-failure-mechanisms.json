@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "mechanisms": [
+    {
+      "id": "M001",
+      "claim_type": "numeric_confabulation_in_rewrites",
+      "regex_signature": "(\\d+)[-\u2013](\\d+)% of (REDACTED|advisors|institutional|retail|REDACTED)",
+      "mechanism_description": "Expert agent introduces a percentage range in a rewrite to replace an 'every X' or 'most X' overclaim from the slide. The specific range is not in the dossier; it's a 'reasonable-sounding' fabrication added during the rewrite step.",
+      "first_caught": {
+        "project_anon": "client-deck-A",
+        "slide_id": "S09",
+        "date": "2026-05-11",
+        "specific_value": "70-80%"
+      },
+      "aggregator_action": "flag_in_rewrite_precision_to_verify",
+      "severity": "HIGH"
+    },
+    {
+      "id": "M002",
+      "claim_type": "source_misattribution",
+      "regex_signature": "(\\$\\d+(?:[.,]\\d+)?\\s*(?:trillion|billion|million|[KMBT])).*?(?:per|via|according to|cited by|attributed to)\\s+([A-Z][A-Za-z& ]+)",
+      "mechanism_description": "Rewrite attributes a category-level statistic from a third-party source (e.g., an industry-survey percentage) to a specific named firm, when the original source does NOT name that firm. Numeric value is correct; the entity binding is fabricated.",
+      "first_caught": {
+        "project_anon": "client-deck-A",
+        "slide_id": "S13",
+        "date": "2026-05-11",
+        "specific_value": "industry stat misattributed to a named firm"
+      },
+      "aggregator_action": "flag_in_rewrite_precision_to_verify",
+      "severity": "HIGH"
+    },
+    {
+      "id": "M004",
+      "claim_type": "paraphrase_as_verbatim_quote",
+      "regex_signature": "\"[^\"]{40,}\"\\s*(?:\u2014|\\-\\-|,)\\s*([A-Z][a-z]+(?:\\s+[A-Z][a-z]+)+)",
+      "mechanism_description": "Slide presents a quote in quotation marks attributed to a named living author, but the text is a paraphrase rather than verbatim. WebFetch on the source URL (when present) confirms mismatch. Risk: shipping a misattribution under quote marks is harder to defend than a paraphrase.",
+      "first_caught": {
+        "project_anon": "client-deck-A",
+        "slide_id": "S16",
+        "date": "2026-05-11",
+        "specific_value": "a named author's newsletter quote \u2014 paraphrase shipped as verbatim"
+      },
+      "aggregator_action": "route_to_source_verifier",
+      "severity": "HIGH"
+    }
+  ]
+}
